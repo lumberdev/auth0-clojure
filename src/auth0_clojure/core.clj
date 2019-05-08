@@ -137,7 +137,7 @@
    (logout-url @global-config params))
   ([{:as config :keys [:client-id]} params]
    (let [base-url         (base-url config)
-         logout-url       (uri/path base-url "/authorize")
+         logout-url       (uri/path base-url "/v2/logout")
          param-logout-url (build-url-params
                             logout-url
                             (merge
