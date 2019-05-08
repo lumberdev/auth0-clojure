@@ -1,6 +1,7 @@
 (ns auth0-clojure.core
   (:require [clojure.string :as string]
-            [org.bovinegenius.exploding-fish :as uri])
+            [org.bovinegenius.exploding-fish :as uri]
+            [clj-http.client :as client])
   (:import (com.auth0.client.auth AuthorizeUrlBuilder AuthAPI LogoutUrlBuilder)))
 
 ;; TODO - probably use ns kw, like :auth0/client-id or ::client-id
@@ -31,8 +32,8 @@
 
 (defn java-login-url [{{:keys [:redirect-to]} :params}]
   (let [authorize-url (-> (auth0-auth-api)
-                          (.authorizeUrl "https://ignorabilis.com/login-user")
-                          (.withScope "openid profile email"))
+                          (.authorizeUrl "http://localhost:1111/user")
+                          (.withScope "openid"))
         authorize-url (if redirect-to
                         (.withState
                           ^AuthorizeUrlBuilder authorize-url
@@ -60,6 +61,7 @@
 
 (def https-scheme "https")
 
+;; TODO - memoize base-url based on default & custom domains
 (defn base-url
   ([]
    (base-url @global-config))
@@ -87,19 +89,41 @@
     :federated (when v "")
     v))
 
-(defn build-url-params [uri-url params-map]
+(def raw-param-ks
+  #{:redirect-uri})
+
+(defn param-key->param-fn
+  "Some query parameters should be raw, depending on the key."
+  [param-key]
+  (if (contains? raw-param-ks param-key)
+    uri/param-raw
+    uri/param))
+
+(defn build-url-params-base [uri params-map]
   (reduce
     (fn [auth-url [k v]]
-      (let [parsed-val (parse-value k v)]
+      (let [parsed-val (parse-value k v)
+            param-fn (param-key->param-fn k)]
         ;; remove any nil values, otherwise they get added to query params without an equal sign
+        ;; for example {:federated nil} -> ... &federated&some_other=1 ...
         (if (nil? parsed-val)
           auth-url
-          (uri/param
+          (param-fn
             auth-url
             (encode-underscore-key k)
             parsed-val))))
-    uri-url
+    uri
     params-map))
+
+(defn build-url-params [uri params-map]
+  ;; TODO - adding raw params in the end is a workaround for that issue:
+  ;; https://github.com/wtetzner/exploding-fish/issues/26
+  ;; revert once it is fixed
+  (let [raw-params-map (select-keys params-map raw-param-ks)
+        params-map (apply dissoc params-map raw-param-ks)
+        params-uri (build-url-params-base uri params-map)
+        raw-params-uri (build-url-params-base params-uri raw-params-map)]
+    raw-params-uri))
 
 ;; TODO - redirect-uri is a MUST
 ;; TODO - check if the same is valid for scope: openid
