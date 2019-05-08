@@ -80,33 +80,26 @@
       name
       (string/replace "-" "_")))
 
-(defn dissoc-nil [map]
-  (apply
-    dissoc
-    map
-    (for [[k v] map
-          :when (nil? v)]
-      k)))
-
 ;; Generate query param values like `federated` with an equal sign;
 ;; it's the safe bet since Auth0 is doing the same
 (defn parse-value [k v]
-  (prn k v)
   (case k
     :federated (when v "")
     v))
 
 (defn build-url-params [uri-url params-map]
-  ;; remove any nil values, otherwise they get added to query params without an equal sign
-  (let [params-map (dissoc-nil params-map)]
-    (reduce
-      (fn [auth-url [k v]]
-        (uri/param
+  (reduce
+    (fn [auth-url [k v]]
+      (let [parsed-val (parse-value k v)]
+        ;; remove any nil values, otherwise they get added to query params without an equal sign
+        (if (nil? parsed-val)
           auth-url
-          (encode-underscore-key k)
-          (parse-value k v)))
-      uri-url
-      params-map)))
+          (uri/param
+            auth-url
+            (encode-underscore-key k)
+            parsed-val))))
+    uri-url
+    params-map))
 
 ;; TODO - redirect-uri is a MUST
 ;; TODO - check if the same is valid for scope: openid
