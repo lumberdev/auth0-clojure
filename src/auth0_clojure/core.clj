@@ -103,7 +103,7 @@
   (reduce
     (fn [auth-url [k v]]
       (let [parsed-val (parse-value k v)
-            param-fn (param-key->param-fn k)]
+            param-fn   (param-key->param-fn k)]
         ;; remove any nil values, otherwise they get added to query params without an equal sign
         ;; for example {:federated nil} -> ... &federated&some_other=1 ...
         (if (nil? parsed-val)
@@ -120,8 +120,8 @@
   ;; https://github.com/wtetzner/exploding-fish/issues/26
   ;; revert once it is fixed
   (let [raw-params-map (select-keys params-map raw-param-ks)
-        params-map (apply dissoc params-map raw-param-ks)
-        params-uri (build-url-params-base uri params-map)
+        params-map     (apply dissoc params-map raw-param-ks)
+        params-uri     (build-url-params-base uri params-map)
         raw-params-uri (build-url-params-base params-uri raw-params-map)]
     raw-params-uri))
 
@@ -163,3 +163,55 @@
          string-url       (-> param-logout-url uri/uri->map uri/map->string)]
      string-url)))
 
+
+;; TODO - refactor in utils, urls, requests
+
+;; requests start from here
+
+(def authorization-header "Authorization")
+(def bearer "Bearer ")
+
+(comment
+  ;; this is the login url used for testing
+  "https://ignorabilis.auth0.com/authorize?response_type=code&scope=openid&client_id=wWiPfXbLs3OUbR74JpXXhF9jrWi3Sgd8&redirect_uri=http://localhost:1111/user"
+
+  ;; this is the req for getting an access-token; just change the code
+  (exchange-code
+    "CODE_HERE"
+    "http://localhost:1111/"))
+
+(defn exchange-code
+  ([code redirect-uri]
+   (exchange-code @global-config code redirect-uri))
+  ([{:as config :keys [:client-id :client-secret]} code redirect-uri]
+   (let [base-url      (base-url config)
+         user-info-url (uri/path base-url "/oauth/token")
+         string-url    (-> user-info-url uri/uri->map uri/map->string)]
+     (client/post
+       string-url
+       {:content-type :json
+        :accept :json
+        ;; TODO - json lib here needed asap
+        :body (format
+                "{\"client_id\": \"%s\", \"client_secret\": \"%s\", \"grant_type\": \"authorization_code\", \"code\": \"%s\", \"redirect_uri\": \"%s\"}"
+                client-id
+                client-secret
+                code
+                redirect-uri)}))))
+
+;; TODO - getting base url,
+;; then appending segment
+;; then doing something else (optional)
+;; then converting to string
+;; is also a pattern; refactor later
+;; TODO - access-token is a MUST
+(defn user-info
+  ([access-token]
+   (user-info @global-config access-token))
+  ([config access-token]
+   (let [base-url      (base-url config)
+         user-info-url (uri/path base-url "/userinfo")
+         string-url    (-> user-info-url uri/uri->map uri/map->string)]
+     (client/get
+       string-url
+       {:headers {authorization-header (str bearer access-token)}}))))
