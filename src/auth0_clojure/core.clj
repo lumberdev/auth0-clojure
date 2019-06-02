@@ -1,11 +1,11 @@
 (ns auth0-clojure.core
   (:require [clojure.string :as string]
             [org.bovinegenius.exploding-fish :as uri]
-            [clj-http.client :as client])
+            [clj-http.client :as client]
+            [cheshire.core :as json])
   (:import (com.auth0.client.auth AuthorizeUrlBuilder AuthAPI LogoutUrlBuilder)))
 
 ;; TODO - probably use ns kw, like :auth0/client-id or ::client-id
-;; TODO - bump clojure to 1.10
 ;; TODO - add spec for domains & subdomains
 
 (def default-domain "ignorabilis.auth0.com")
