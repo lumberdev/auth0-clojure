@@ -171,16 +171,21 @@
 (def authorization-header "Authorization")
 (def bearer "Bearer ")
 
-(comment
-  ;; this is the login url used for testing - only openid scope
-  "https://ignorabilis.auth0.com/authorize?response_type=code&scope=openid&client_id=wWiPfXbLs3OUbR74JpXXhF9jrWi3Sgd8&redirect_uri=http://localhost:1111/user"
-  ;; this is the login url used for testing - openid profile email
-  "https://ignorabilis.auth0.com/authorize?response_type=code&scope=openid+profile+email&client_id=wWiPfXbLs3OUbR74JpXXhF9jrWi3Sgd8&redirect_uri=http://localhost:1111/user"
+;; TODO - these are some sort of utils, so move them later
+(defn dashes->underscores [str]
+  (string/replace str \- \_))
+(defn underscores->dashes [str]
+  (string/replace str \_ \-))
 
-  ;; this is the req for getting an access-token; just change the code
-  (exchange-code
-    "CODE_HERE"
-    "http://localhost:1111/"))
+(defn keyword->json-attribute [k]
+  (-> k
+      name
+      dashes->underscores))
+
+(defn edn->json [edn]
+  (json/generate-string
+    edn
+    {:key-fn keyword->json-attribute}))
 
 (defn exchange-code
   ([code redirect-uri]
@@ -192,8 +197,7 @@
      (client/post
        string-url
        {:content-type :json
-        :accept :json
-        ;; TODO - json lib here needed asap
+        :accept       :json
         :body (format
                 "{\"client_id\": \"%s\", \"client_secret\": \"%s\", \"grant_type\": \"authorization_code\", \"code\": \"%s\", \"redirect_uri\": \"%s\"}"
                 client-id
