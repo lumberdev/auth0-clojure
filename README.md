@@ -9,6 +9,8 @@ TODO
 ## Dev Plan
 
 - JSON utilities - make EDN <-> JSON stuff simpler
+- Decode body
+- Basic request structure + don't throw exceptions
 - Finish the implementation of all Auth Java methods + find if there are any other API endpoints
 - Remove the original Auth0 Java lib from dependencies
 - Provide a very basic readme + move these docs elsewhere
