@@ -30,6 +30,18 @@
         a0-client-secret client-secret]
     (AuthAPI. default-domain a0-client-id a0-client-secret)))
 
+;; TODO - these could be exposed too
+;; withScope should work with plain string like
+;; "openid email profile"
+;; or with a set or vector of strings/keywords, like this:
+(comment
+  [:auth0.values/openid :auth0.values/email]
+  ; or perhaps
+  [:auth0.scope/openid :auth0.scope/email]
+  ;alternatives
+  #{:openid :email})
+;; These then get converted to a set, then to string
+;; TODO - scope validation (if string convert to set & validate)
 (defn java-login-url [{{:keys [:redirect-to]} :params}]
   (let [authorize-url (-> (auth0-auth-api)
                           (.authorizeUrl "http://localhost:1111/user")
