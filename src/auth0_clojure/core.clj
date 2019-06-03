@@ -35,9 +35,8 @@
 ;; "openid email profile"
 ;; or with a set or vector of strings/keywords, like this:
 (comment
-  [:auth0.values/openid :auth0.values/email]
-  ; or perhaps
   [:auth0.scope/openid :auth0.scope/email]
+  #{:auth0.scope/openid :auth0.scope/profile}
   ;alternatives
   #{:openid :email})
 ;; These then get converted to a set, then to string
@@ -207,7 +206,7 @@
                          :auth0/code          code
                          :auth0/redirect-uri  redirect-uri
                          :auth0/grant-type    (json/kw->json-attr
-                                                :auth0.values/authorization-code)})}))))
+                                                :auth0.grant-type/authorization-code)})}))))
 
 (comment
   ;; this is the login url used for testing - only openid scope
