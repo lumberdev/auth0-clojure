@@ -1,12 +1,9 @@
 (ns auth0-clojure.core
-  (:require [clojure.string :as string]
+  (:require [auth0-clojure.json :as json]
+            [clojure.string :as string]
             [org.bovinegenius.exploding-fish :as uri]
-            [clj-http.client :as client]
-            [cheshire.core :as json]
-            [clojure.java.io :as io]
-            [clj-http.util :as util])
-  (:import (com.auth0.client.auth AuthorizeUrlBuilder AuthAPI LogoutUrlBuilder)
-           (java.io EOFException BufferedReader)))
+            [clj-http.client :as client])
+  (:import (com.auth0.client.auth AuthorizeUrlBuilder AuthAPI LogoutUrlBuilder)))
 
 ;; TODO - probably use ns kw, like :auth0/client-id or ::client-id
 ;; TODO - add spec for domains & subdomains
@@ -174,39 +171,10 @@
 (def authorization-header "Authorization")
 (def bearer "Bearer ")
 
-;; TODO - these are some sort of utils, so move them later
-(defn dashes->underscores [str]
-  (string/replace str \- \_))
-(defn underscores->dashes [str]
-  (string/replace str \_ \-))
 
-(defn kw->json-attr [k]
-  (-> k
-      name
-      dashes->underscores))
 
-(defn json-attr->kw [str]
-  (->> str
-       underscores->dashes
-       (keyword "auth0")))
-
-(defn edn->json [edn]
-  (json/generate-string
-    edn
-    {:key-fn kw->json-attr}))
-
-(defmethod client/coerce-response-body :auth0-edn [_ {:keys [body] :as resp}]
-  ;; this snippet is based on client/decode-json-body, which is private
-  (let [^BufferedReader br (io/reader (util/force-stream body))
-        json-body          (try
-                             (.mark br 1)
-                             (let [^int first-char (try (.read br) (catch EOFException _ -1))]
-                               (case first-char
-                                 -1 nil
-                                 (do (.reset br)
-                                     (json/parse-stream br json-attr->kw))))
-                             (finally (.close br)))]
-    (assoc resp :body json-body)))
+(defmethod client/coerce-response-body :auth0-edn [_ resp]
+  (json/coerce-responce-body-to-auth0-edn resp))
 
 (defn exchange-code
   ([code redirect-uri]
@@ -221,12 +189,12 @@
        {:as           :auth0-edn
         :content-type :json
         :accept       :json
-        :body         (edn->json
+        :body         (json/edn->json
                         {:auth0/client-id     client-id
                          :auth0/client-secret client-secret
                          :auth0/code          code
                          :auth0/redirect-uri  redirect-uri
-                         :auth0/grant-type    (kw->json-attr
+                         :auth0/grant-type    (json/kw->json-attr
                                                 :auth0.values/authorization-code)})}))))
 
 (comment
