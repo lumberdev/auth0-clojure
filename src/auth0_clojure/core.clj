@@ -204,11 +204,12 @@
     (client/request
       (merge
         ;; TODO - getting EDN is cool, but in some cases JSON might be preferable - make this configurable
-        {:url          string-url
-         :method       :get
-         :content-type :json
-         :accept       :json
-         :as           :auth0-edn}
+        {:url              string-url
+         :method           :get
+         :content-type     :json
+         :accept           :json
+         :as               :auth0-edn
+         :throw-exceptions false}
         (edit-if
           options
           :body
