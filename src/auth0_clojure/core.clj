@@ -182,7 +182,19 @@
 (def authorization-header "Authorization")
 (def bearer "Bearer ")
 
-
+;; TODO - move this in a different ns
+(defn auth0-client [config path options]
+  (let [base-url      (base-url config)
+        user-info-url (uri/path base-url path)
+        string-url    (-> user-info-url uri/uri->map uri/map->string)]
+    (client/request
+      (merge
+        ;; TODO - getting EDN is cool, but in some cases JSON might be preferable - make this configurable
+        {:url          string-url
+         :method       :get
+         :content-type :json
+         :accept       :json
+         :as           :auth0-edn}))))
 
 (defmethod client/coerce-response-body :auth0-edn [_ resp]
   (json/coerce-responce-body-to-auth0-edn resp))
@@ -191,22 +203,19 @@
   ([code redirect-uri]
    (exchange-code @global-config code redirect-uri))
   ([{:as config :keys [:client-id :client-secret]} code redirect-uri]
-   (let [base-url      (base-url config)
-         user-info-url (uri/path base-url "/oauth/token")
-         string-url    (-> user-info-url uri/uri->map uri/map->string)]
-     (client/post
-       string-url
-       ;; TODO - getting EDN is cool, but in some cases JSON might be preferable - make this configurable
-       {:as           :auth0-edn
-        :content-type :json
-        :accept       :json
-        :body         (json/edn->json
-                        {:auth0/client-id     client-id
-                         :auth0/client-secret client-secret
-                         :auth0/code          code
-                         :auth0/redirect-uri  redirect-uri
-                         :auth0/grant-type    (json/kw->json-attr
-                                                :auth0.grant-type/authorization-code)})}))))
+   (auth0-client
+     config
+     "/oauth/token"
+     {:method :post
+      ;; TODO - pull edn->json in the client too
+      ;; TODO - grant type should be configurable; allow string, kw & ns kw
+      :body   (json/edn->json
+                {:auth0/client-id     client-id
+                 :auth0/client-secret client-secret
+                 :auth0/code          code
+                 :auth0/redirect-uri  redirect-uri
+                 :auth0/grant-type    (json/kw->json-attr
+                                        :auth0.grant-type/authorization-code)})})))
 
 (comment
   ;; this is the login url used for testing - only openid scope
@@ -219,20 +228,12 @@
     "CODE_HERE"
     "http://localhost:1111/"))
 
-;; TODO - getting base url,
-;; then appending segment
-;; then doing something else (optional)
-;; then converting to string
-;; is also a pattern; refactor later
-;; TODO - access-token is a MUST
+;; TODO - access-token is a MUST - needs spec
 (defn user-info
   ([access-token]
    (user-info @global-config access-token))
   ([config access-token]
-   (let [base-url      (base-url config)
-         user-info-url (uri/path base-url "/userinfo")
-         string-url    (-> user-info-url uri/uri->map uri/map->string)]
-     (client/get
-       string-url
-       {:as      :auth0-edn
-        :headers {authorization-header (str bearer access-token)}}))))
+   (auth0-client
+     config
+     "/userinfo"
+     {:headers {authorization-header (str bearer access-token)}})))
