@@ -214,6 +214,7 @@
           :body
           json/edn->json)))))
 
+;; TODO - body here should be configurable - a map can be used and then spec-ed later
 (defn exchange-code
   ([code redirect-uri]
    (exchange-code @global-config code redirect-uri))
