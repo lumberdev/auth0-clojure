@@ -182,6 +182,20 @@
 (def authorization-header "Authorization")
 (def bearer "Bearer ")
 
+(defn edit-if
+  "'Edits' a value in an associative structure, where k is a
+  key and f is a function that will take the old value if it exists
+  and any supplied args and return the new value, and returns a new
+  structure. If the value does not exist returns the structure supplied."
+  [m k f & args]
+  (if (contains? m k)
+    (let [val (get m k)]
+      (assoc m k (apply (partial f val) args)))
+    m))
+
+(defmethod client/coerce-response-body :auth0-edn [_ resp]
+  (json/coerce-responce-body-to-auth0-edn resp))
+
 ;; TODO - move this in a different ns
 (defn auth0-client [config path options]
   (let [base-url      (base-url config)
@@ -194,10 +208,11 @@
          :method       :get
          :content-type :json
          :accept       :json
-         :as           :auth0-edn}))))
-
-(defmethod client/coerce-response-body :auth0-edn [_ resp]
-  (json/coerce-responce-body-to-auth0-edn resp))
+         :as           :auth0-edn}
+        (edit-if
+          options
+          :body
+          json/edn->json)))))
 
 (defn exchange-code
   ([code redirect-uri]
@@ -207,15 +222,13 @@
      config
      "/oauth/token"
      {:method :post
-      ;; TODO - pull edn->json in the client too
       ;; TODO - grant type should be configurable; allow string, kw & ns kw
-      :body   (json/edn->json
-                {:auth0/client-id     client-id
-                 :auth0/client-secret client-secret
-                 :auth0/code          code
-                 :auth0/redirect-uri  redirect-uri
-                 :auth0/grant-type    (json/kw->json-attr
-                                        :auth0.grant-type/authorization-code)})})))
+      :body   {:auth0/client-id     client-id
+               :auth0/client-secret client-secret
+               :auth0/code          code
+               :auth0/redirect-uri  redirect-uri
+               :auth0/grant-type    (json/kw->json-attr
+                                      :auth0.grant-type/authorization-code)}})))
 
 (comment
   ;; this is the login url used for testing - only openid scope
