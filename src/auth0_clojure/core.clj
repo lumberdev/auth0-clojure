@@ -274,3 +274,38 @@
                    "/userinfo"
                    {:headers {authorization-header (str bearer access-token)}})]
      (client/request request))))
+
+(defn passwordless-start
+  ([opts]
+   (passwordless-start @global-config opts))
+  ([config opts]
+   (let [request (auth0-request
+                   config
+                   "/passwordless/start"
+                   {:method :post
+                    :body   (merge
+                              {:auth0/client-id client-id}
+                              opts)})]
+     (client/request request))))
+
+(comment
+
+  (passwordless-start
+    {:auth0/connection "email"
+     :auth0/email      "irina.yaroslavova@ignorabilis.com"
+     ;:auth0/send       "link"           ;; can be link/code
+     ;:auth0/authParams {:auth0/scope "openid"}
+     }))
+
+(defn passwordless-verify
+  ([opts]
+   (passwordless-verify @global-config opts))
+  ([config opts]
+   (let [request (auth0-request
+                   config
+                   "/passwordless/verify"
+                   {:method :post
+                    :body   (merge
+                              {:auth0/client-id client-id}
+                              opts)})]
+     (client/request request))))
