@@ -228,19 +228,18 @@
 
 ;; TODO - body here should be configurable - a map can be used and then spec-ed later
 (defn exchange-code
-  ([code redirect-uri]
-   (exchange-code @global-config code redirect-uri))
-  ([{:as config :keys [:client-id :client-secret]} code redirect-uri]
+  ([code redirect-uri grant-type]
+   (exchange-code @global-config code redirect-uri grant-type))
+  ([{:as config :keys [:client-id :client-secret]} code redirect-uri grant-type]
    (let [request (auth0-request
                    config
                    "/oauth/token"
                    {:method :post
-                    ;; TODO - grant type should be configurable; allow string, kw & ns kw
                     :body   {:auth0/client-id     client-id
                              :auth0/client-secret client-secret
                              :auth0/code          code
                              :auth0/redirect-uri  redirect-uri
-                             :auth0/grant-type    :auth0.grant-type/authorization-code}})]
+                             :auth0/grant-type    grant-type}})]
      (client/request request))))
 
 (comment
@@ -252,7 +251,8 @@
   ;; this is the req for getting an access-token; just change the code
   (exchange-code
     "CODE_HERE"
-    "http://localhost:1111/"))
+    "http://localhost:1111/"
+    :auth0.grant-type/authorization-code))
 
 ;; TODO - access-token is a MUST - needs spec
 (defn user-info
