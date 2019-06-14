@@ -193,6 +193,15 @@
       (assoc m k (apply (partial f val) args)))
     m))
 
+(def oauth-ks
+  #{:auth0/grant-type})
+
+(defn oauth-vals-edn->json [body]
+  (let [edn-vals (select-keys body oauth-ks)
+        json-vals (into {} (for [[k v] edn-vals] [k (json/kw->json-attr v)]))
+        body (merge body json-vals)]
+    body))
+
 (defmethod client/coerce-response-body :auth0-edn [_ resp]
   (json/coerce-responce-body-to-auth0-edn resp))
 
@@ -200,20 +209,23 @@
 (defn auth0-client [config path options]
   (let [base-url      (base-url config)
         user-info-url (uri/path base-url path)
-        string-url    (-> user-info-url uri/uri->map uri/map->string)]
-    (client/request
-      (merge
-        ;; TODO - getting EDN is cool, but in some cases JSON might be preferable - make this configurable
-        {:url              string-url
-         :method           :get
-         :content-type     :json
-         :accept           :json
-         :as               :auth0-edn
-         :throw-exceptions false}
-        (edit-if
-          options
-          :body
-          json/edn->json)))))
+        string-url    (-> user-info-url uri/uri->map uri/map->string)
+        request (merge
+                  ;; TODO - getting EDN is cool, but in some cases JSON might be preferable - make this configurable
+                  {:url              string-url
+                   :method           :get
+                   :content-type     :json
+                   :accept           :json
+                   :as               :auth0-edn
+                   :throw-exceptions false}
+                  (edit-if
+                    options
+                    :body
+                    (fn [body]
+                      (-> body
+                          oauth-vals-edn->json
+                          json/edn->json))))]
+    (client/request request)))
 
 ;; TODO - body here should be configurable - a map can be used and then spec-ed later
 (defn exchange-code
@@ -229,8 +241,7 @@
                :auth0/client-secret client-secret
                :auth0/code          code
                :auth0/redirect-uri  redirect-uri
-               :auth0/grant-type    (json/kw->json-attr
-                                      :auth0.grant-type/authorization-code)}})))
+               :auth0/grant-type    :auth0.grant-type/authorization-code}})))
 
 (comment
   ;; this is the login url used for testing - only openid scope
