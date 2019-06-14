@@ -206,42 +206,42 @@
   (json/coerce-responce-body-to-auth0-edn resp))
 
 ;; TODO - move this in a different ns
-(defn auth0-client [config path options]
+(defn auth0-request [config path options]
   (let [base-url      (base-url config)
         user-info-url (uri/path base-url path)
-        string-url    (-> user-info-url uri/uri->map uri/map->string)
-        request (merge
-                  ;; TODO - getting EDN is cool, but in some cases JSON might be preferable - make this configurable
-                  {:url              string-url
-                   :method           :get
-                   :content-type     :json
-                   :accept           :json
-                   :as               :auth0-edn
-                   :throw-exceptions false}
-                  (edit-if
-                    options
-                    :body
-                    (fn [body]
-                      (-> body
-                          oauth-vals-edn->json
-                          json/edn->json))))]
-    (client/request request)))
+        string-url    (-> user-info-url uri/uri->map uri/map->string)]
+    (merge
+      ;; TODO - getting EDN is cool, but in some cases JSON might be preferable - make this configurable
+      {:url              string-url
+       :method           :get
+       :content-type     :json
+       :accept           :json
+       :as               :auth0-edn
+       :throw-exceptions false}
+      (edit-if
+        options
+        :body
+        (fn [body]
+          (-> body
+              oauth-vals-edn->json
+              json/edn->json))))))
 
 ;; TODO - body here should be configurable - a map can be used and then spec-ed later
 (defn exchange-code
   ([code redirect-uri]
    (exchange-code @global-config code redirect-uri))
   ([{:as config :keys [:client-id :client-secret]} code redirect-uri]
-   (auth0-client
-     config
-     "/oauth/token"
-     {:method :post
-      ;; TODO - grant type should be configurable; allow string, kw & ns kw
-      :body   {:auth0/client-id     client-id
-               :auth0/client-secret client-secret
-               :auth0/code          code
-               :auth0/redirect-uri  redirect-uri
-               :auth0/grant-type    :auth0.grant-type/authorization-code}})))
+   (let [request (auth0-request
+                   config
+                   "/oauth/token"
+                   {:method :post
+                    ;; TODO - grant type should be configurable; allow string, kw & ns kw
+                    :body   {:auth0/client-id     client-id
+                             :auth0/client-secret client-secret
+                             :auth0/code          code
+                             :auth0/redirect-uri  redirect-uri
+                             :auth0/grant-type    :auth0.grant-type/authorization-code}})]
+     (client/request request))))
 
 (comment
   ;; this is the login url used for testing - only openid scope
@@ -259,7 +259,8 @@
   ([access-token]
    (user-info @global-config access-token))
   ([config access-token]
-   (auth0-client
-     config
-     "/userinfo"
-     {:headers {authorization-header (str bearer access-token)}})))
+   (let [request (auth0-request
+                   config
+                   "/userinfo"
+                   {:headers {authorization-header (str bearer access-token)}})]
+     (client/request request))))
