@@ -150,7 +150,6 @@
          param-auth-url (build-url-params
                           auth-url
                           (merge
-                            {:response-type "code"}
                             params
                             (select-keys config [:client-id])))
          string-url     (-> param-auth-url uri/uri->map uri/map->string)]
@@ -197,9 +196,9 @@
   #{:auth0/grant-type})
 
 (defn oauth-vals-edn->json [body]
-  (let [edn-vals (select-keys body oauth-ks)
+  (let [edn-vals  (select-keys body oauth-ks)
         json-vals (into {} (for [[k v] edn-vals] [k (json/kw->json-attr v)]))
-        body (merge body json-vals)]
+        body      (merge body json-vals)]
     body))
 
 (defmethod client/coerce-response-body :auth0-edn [_ resp]
@@ -226,20 +225,21 @@
               oauth-vals-edn->json
               json/edn->json))))))
 
-;; TODO - body here should be configurable - a map can be used and then spec-ed later
+;; TODO - spec the map later
 (defn exchange-code
-  ([code redirect-uri grant-type]
-   (exchange-code @global-config code redirect-uri grant-type))
-  ([{:as config :keys [:client-id :client-secret]} code redirect-uri grant-type]
+  ([opts]
+   (exchange-code @global-config opts))
+  ([{:as   config
+     :keys [:client-id :client-secret]}
+    opts]
    (let [request (auth0-request
                    config
                    "/oauth/token"
                    {:method :post
-                    :body   {:auth0/client-id     client-id
-                             :auth0/client-secret client-secret
-                             :auth0/code          code
-                             :auth0/redirect-uri  redirect-uri
-                             :auth0/grant-type    grant-type}})]
+                    :body   (merge
+                              {:auth0/client-id     client-id
+                               :auth0/client-secret client-secret}
+                              opts)})]
      (client/request request))))
 
 (comment
@@ -250,9 +250,9 @@
 
   ;; this is the req for getting an access-token; just change the code
   (exchange-code
-    "CODE_HERE"
-    "http://localhost:1111/"
-    :auth0.grant-type/authorization-code))
+    {:auth0/code         "CODE_HERE"
+     :auth0/redirect-uri "http://localhost:1111/"
+     :auth0/grant-type   :auth0.grant-type/authorization-code}))
 
 ;; TODO - access-token is a MUST - needs spec
 (defn user-info
