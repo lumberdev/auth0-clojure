@@ -309,3 +309,38 @@
                               {:auth0/client-id client-id}
                               opts)})]
      (client/request request))))
+
+(defn sign-up
+  ([opts]
+   (sign-up @global-config opts))
+  ([config opts]
+   (let [request (auth0-request
+                   config
+                   "/dbconnections/signup"
+                   {:method :post
+                    :body   (merge
+                              {:auth0/client-id client-id}
+                              opts)})]
+     (client/request request))))
+
+(comment
+
+  ;; minimal
+  (sign-up
+    {:auth0/email "irina@lumberdev.nyc"
+     :auth0/password "123"
+     :auth0/connection "Username-Password-Authentication"})
+
+  ;; all
+  (sign-up
+    {:auth0/email "irina@lumberdev.nyc"
+     :auth0/password "123"
+     :auth0/connection "Username-Password-Authentication"
+     :auth0/username "ignorabilis"      ;; ignored if not required by DB
+     :auth0/given-name "Irina"
+     :auth0/family-name "Stefanova"
+     :auth0/name "Irina Yaroslavova Stefanova"
+     :auth0/nickname "Iri"
+     :auth0/picture "https://image.shutterstock.com/image-vector/woman-profile-picture-vector-260nw-438753232.jpg"
+     :auth0/user-metadata {:some-random "metadata"}})
+  )
