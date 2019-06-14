@@ -136,17 +136,6 @@
         raw-params-uri (build-url-params-base params-uri raw-params-map)]
     raw-params-uri))
 
-(comment
-
-  (authorize-url
-    {:auth0/response-type "code"
-     :auth0/scope "openid profile"
-     :auth0/redirect-uri "http://localhost:1111/login-user"})
-
-  (logout-url
-    {:auth0/return-to "http://localhost:1111/login"
-     :auth0/federated true}))
-
 ;; TODO - redirect-uri is a MUST
 ;; TODO - check if the same is valid for scope: openid
 ;; TODO - spec for valid keys here: scope, state, audience, connection, response-type
@@ -184,6 +173,16 @@
          string-url       (-> param-logout-url uri/uri->map uri/map->string)]
      string-url)))
 
+(comment
+
+  (authorize-url
+    {:auth0/response-type "code"
+     :auth0/scope         "openid profile"
+     :auth0/redirect-uri  "http://localhost:1111/login-user"})
+
+  (logout-url
+    {:auth0/return-to "http://localhost:1111/login"
+     :auth0/federated true}))
 
 ;; TODO - refactor in utils, urls, requests
 
