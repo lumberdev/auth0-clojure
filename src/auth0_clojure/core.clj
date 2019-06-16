@@ -186,6 +186,28 @@
 
 ;; TODO - refactor in utils, urls, requests
 
+;; SAML
+(defn accept-saml-url
+  ([params]
+   (accept-saml-url @global-config params))
+  ([{:as   config
+     :keys [:auth0/client-id]} params]
+   (let [base-url       (base-url config)
+         saml-url       (uri/path base-url (str "/samlp/" client-id))
+         param-saml-url (build-url-params saml-url params)
+         string-url     (-> param-saml-url uri/uri->map uri/map->string)]
+     string-url)))
+
+(comment
+
+  ;; get default auth0 login screen
+  (accept-saml-url
+    {})
+
+  ;; get the login screen for the respective connection
+  (accept-saml-url
+    {:auth0/connection "<samlp-connection-name>"}))
+
 ;; requests start from here
 
 (def authorization-header "Authorization")
