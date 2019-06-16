@@ -14,10 +14,10 @@
 (def client-secret "0fkMFyofJiWinkwnl4Udcs_oAf7P4e6-WKTx8TAyC8Gh_CyrzytOylsD6bftrRoO")
 
 (def some-default-config
-  {:default-domain "ignorabilis.auth0.com"
-   :custom-domain  "ignorabilis.auth0.com"
-   :client-id      "wWiPfXbLs3OUbR74JpXXhF9jrWi3Sgd8"
-   :client-secret  "0fkMFyofJiWinkwnl4Udcs_oAf7P4e6-WKTx8TAyC8Gh_CyrzytOylsD6bftrRoO"})
+  {:auth0/default-domain "ignorabilis.auth0.com"
+   :auth0/custom-domain  "ignorabilis.auth0.com"
+   :auth0/client-id      "wWiPfXbLs3OUbR74JpXXhF9jrWi3Sgd8"
+   :auth0/client-secret  "0fkMFyofJiWinkwnl4Udcs_oAf7P4e6-WKTx8TAyC8Gh_CyrzytOylsD6bftrRoO"})
 
 (def global-config
   (atom {}))
@@ -76,8 +76,8 @@
 (defn base-url
   ([]
    (base-url @global-config))
-  ([{:keys [:default-domain
-            :custom-domain]}]
+  ([{:keys [:auth0/default-domain
+            :auth0/custom-domain]}]
    (uri/map->uri {:scheme https-scheme
                   :host   (or custom-domain default-domain)})))
 
@@ -216,7 +216,11 @@
 
 ;; TODO - move this in a different ns
 (defn auth0-request [config path options]
-  (let [base-url      (base-url config)
+  (let [base-url      (base-url
+                        (select-keys
+                          config
+                          [:auth0/default-domain
+                           :auth0/custom-domain]))
         user-info-url (uri/path base-url path)
         string-url    (-> user-info-url uri/uri->map uri/map->string)]
     (merge
@@ -240,7 +244,7 @@
   ([opts]
    (exchange-code @global-config opts))
   ([{:as   config
-     :keys [:client-id :client-secret]}
+     :keys [:auth0/client-id :auth0/client-secret]}
     opts]
    (let [request (auth0-request
                    config
@@ -278,7 +282,9 @@
 (defn passwordless-start
   ([opts]
    (passwordless-start @global-config opts))
-  ([config opts]
+  ([{:as   config
+     :keys [:auth0/client-id]}
+    opts]
    (let [request (auth0-request
                    config
                    "/passwordless/start"
@@ -300,7 +306,9 @@
 (defn passwordless-verify
   ([opts]
    (passwordless-verify @global-config opts))
-  ([config opts]
+  ([{:as   config
+     :keys [:auth0/client-id]}
+    opts]
    (let [request (auth0-request
                    config
                    "/passwordless/verify"
@@ -313,7 +321,9 @@
 (defn sign-up
   ([opts]
    (sign-up @global-config opts))
-  ([config opts]
+  ([{:as   config
+     :keys [:auth0/client-id]}
+    opts]
    (let [request (auth0-request
                    config
                    "/dbconnections/signup"
@@ -349,7 +359,9 @@
 (defn change-password
   ([opts]
    (change-password @global-config opts))
-  ([config opts]
+  ([{:as   config
+     :keys [:auth0/client-id]}
+    opts]
    (let [request (auth0-request
                    config
                    "/dbconnections/change_password"
