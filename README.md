@@ -8,7 +8,6 @@ TODO
 
 ## Dev Plan
 
-- Next: Basic request structure + don't throw exceptions
 - Finish the implementation of all Auth Java methods + find if there are any other API endpoints
 - Handle values like `openid`, `email`, `authorization-code`, etc.; check the OpenID standards for an exhaustive list
 - Remove the original Auth0 Java lib from dependencies
