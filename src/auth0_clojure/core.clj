@@ -144,14 +144,14 @@
   Valid params: connection audience scope state response-type"
   ([params]
    (authorize-url @global-config params))
-  ([{:as config :keys [:client-id]} params]
+  ([config params]
    (let [base-url       (base-url config)
          auth-url       (uri/path base-url "/authorize")
          param-auth-url (build-url-params
                           auth-url
                           (merge
                             params
-                            (select-keys config [:client-id])))
+                            (select-keys config [:auth0/client-id])))
          string-url     (-> param-auth-url uri/uri->map uri/map->string)]
      string-url)))
 
@@ -162,14 +162,14 @@
   Valid params: federated"
   ([params]
    (logout-url @global-config params))
-  ([{:as config :keys [:client-id]} params]
+  ([config params]
    (let [base-url         (base-url config)
          logout-url       (uri/path base-url "/v2/logout")
          param-logout-url (build-url-params
                             logout-url
                             (merge
                               params
-                              (select-keys config [:client-id])))
+                              (select-keys config [:auth0/client-id])))
          string-url       (-> param-logout-url uri/uri->map uri/map->string)]
      string-url)))
 
@@ -365,4 +365,3 @@
   (change-password
     {:auth0/email      "irina@lumberdev.nyc"
      :auth0/connection "Username-Password-Authentication"}))
-
