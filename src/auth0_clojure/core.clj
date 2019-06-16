@@ -345,6 +345,7 @@
      :auth0/user-metadata {:some-random "metadata"}})
   )
 
+;; TODO - error responses return json; take care of the inconsistent API and convert those responses to json manually
 (defn change-password
   ([opts]
    (change-password @global-config opts))
