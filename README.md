@@ -8,7 +8,6 @@ TODO
 
 ## TODO
 
-- Authentication API Authorization
 - Check the Java implementation for any
 - Remove the original Auth0 Java lib from dependencies
 - Cleanup
