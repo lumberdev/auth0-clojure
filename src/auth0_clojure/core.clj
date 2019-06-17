@@ -210,6 +210,19 @@
          string-url (-> saml-url uri/uri->map uri/map->string)]
      string-url)))
 
+;; providing a connection is optional;
+;; no connection -> SP initiated url
+;; connection -> IdP initiated url
+(defn sp-idp-init-flow-url
+  ([params]
+   (sp-idp-init-flow-url @global-config params))
+  ([config params]
+   (let [base-url       (base-url config)
+         saml-url       (uri/path base-url "/login/callback")
+         param-saml-url (build-url-params saml-url params)
+         string-url     (-> param-saml-url uri/uri->map uri/map->string)]
+     string-url)))
+
 (comment
 
   ;; get default auth0 login screen
