@@ -426,3 +426,23 @@
   (change-password
     {:auth0/email      "irina@lumberdev.nyc"
      :auth0/connection "Username-Password-Authentication"}))
+
+(defn dynamically-register-client
+  ([opts]
+   (dynamically-register-client @global-config opts))
+  ([{:as   config
+     :keys [:auth0/client-id]}
+    {:as   opts
+     :keys [:auth0/redirect-uris]}]
+   (let [request (auth0-request
+                   config
+                   "/oidc/register"
+                   {:method :post
+                    :body   (merge
+                              {:auth0/redirect-uris (or redirect-uris [])}
+                              opts)})]
+     (client/request request))))
+
+(comment
+  (dynamically-register-client
+    {:auth0/client-name "New client"}))
