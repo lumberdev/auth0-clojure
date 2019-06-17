@@ -15,6 +15,7 @@ TODO
 - Very basic readme
 - License
 - First alpha
+- Spec
 - Authentication API Passwordless support
 - Authentication API MFA support
 - Authentication API WS-Federation support
