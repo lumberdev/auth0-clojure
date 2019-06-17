@@ -317,6 +317,24 @@
      :auth0/redirect-uri "http://localhost:1111/"
      :auth0/grant-type   :auth0.grant-type/authorization-code}))
 
+;; only :auth0/token is required
+(defn oauth-revoke
+  ([opts]
+   (oauth-revoke @global-config opts))
+  ([{:as   config
+     :keys [:auth0/client-id
+            :auth0/client-secret]}
+    opts]
+   (let [request (auth0-request
+                   config
+                   "/oauth/revoke"
+                   {:method :post
+                    :body   (merge
+                              {:auth0/client-id     client-id
+                               :auth0/client-secret client-secret}
+                              opts)})]
+     (client/request request))))
+
 ;; TODO - access-token is a MUST - needs spec
 (defn user-info
   ([access-token]
