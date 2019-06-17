@@ -289,9 +289,9 @@
               json/edn->json))))))
 
 ;; TODO - spec the map later
-(defn exchange-code
+(defn oauth-token
   ([opts]
-   (exchange-code @global-config opts))
+   (oauth-token @global-config opts))
   ([{:as   config
      :keys [:auth0/client-id :auth0/client-secret]}
     opts]
@@ -312,7 +312,7 @@
   "https://ignorabilis.auth0.com/authorize?response_type=code&scope=openid+profile+email&client_id=wWiPfXbLs3OUbR74JpXXhF9jrWi3Sgd8&redirect_uri=http://localhost:1111/user"
 
   ;; this is the req for getting an access-token; just change the code
-  (exchange-code
+  (oauth-token
     {:auth0/code         "CODE_HERE"
      :auth0/redirect-uri "http://localhost:1111/"
      :auth0/grant-type   :auth0.grant-type/authorization-code}))
