@@ -187,15 +187,27 @@
 ;; TODO - refactor in utils, urls, requests
 
 ;; SAML
+;; the only param is connection and it is optional
 (defn accept-saml-url
   ([params]
    (accept-saml-url @global-config params))
   ([{:as   config
-     :keys [:auth0/client-id]} params]
+     :keys [:auth0/client-id]}
+    params]
    (let [base-url       (base-url config)
          saml-url       (uri/path base-url (str "/samlp/" client-id))
          param-saml-url (build-url-params saml-url params)
          string-url     (-> param-saml-url uri/uri->map uri/map->string)]
+     string-url)))
+
+(defn saml-metadata-url
+  ([]
+   (saml-metadata-url @global-config))
+  ([{:as   config
+     :keys [:auth0/client-id]}]
+   (let [base-url   (base-url config)
+         saml-url   (uri/path base-url (str "/samlp/metadata/" client-id))
+         string-url (-> saml-url uri/uri->map uri/map->string)]
      string-url)))
 
 (comment
@@ -206,7 +218,9 @@
 
   ;; get the login screen for the respective connection
   (accept-saml-url
-    {:auth0/connection "<samlp-connection-name>"}))
+    {:auth0/connection "<samlp-connection-name>"})
+
+  (saml-metadata-url))
 
 ;; requests start from here
 
