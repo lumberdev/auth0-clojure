@@ -1,22 +1,28 @@
 # auth0-clojure
 
-A Clojure implementation of the Auth0 Auth & Management APIs.
+A Clojure implementation of the Auth0 Authentication & Management APIs.
 
 ## Usage
 
 TODO
 
-## Dev Plan
+## TODO
 
-- Finish the implementation of all Auth Java methods + find if there are any other API endpoints
-- Handle values like `openid`, `email`, `authorization-code`, etc.; check the OpenID standards for an exhaustive list
+- Authentication API Authorization
+- Check the Java implementation for any
 - Remove the original Auth0 Java lib from dependencies
-- Provide a very basic readme + move these docs elsewhere
-- Provide more detailed samples
-- Publish alpha
-- Start work on Management API
-- Add a default utility that handles Management API token refreshes
-- Add tests
+- Cleanup
+- Very basic readme
+- License
+- First alpha
+- Authentication API Passwordless support
+- Authentication API MFA support
+- Authentication API WS-Federation support
+- Handle values like `openid`, `email`, `authorization-code`, etc.; check the OpenID standards for an exhaustive list
+- Detailed samples
+- Management API
+- Default utility that handles Management API token refreshes
+- Tests
 
 ## License
 
