@@ -1,5 +1,5 @@
 (ns auth0-clojure.api.authentication
-  (:require [auth0-clojure.json :as json]
+  (:require [auth0-clojure.utils.json :as json]
             [clojure.string :as string]
             [org.bovinegenius.exploding-fish :as uri]
             [clj-http.client :as client]))

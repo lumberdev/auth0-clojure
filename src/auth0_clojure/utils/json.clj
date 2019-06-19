@@ -1,4 +1,4 @@
-(ns auth0-clojure.json
+(ns auth0-clojure.utils.json
   (:require [clojure.string :as string]
             [cheshire.core :as json]
             [clojure.java.io :as io]
