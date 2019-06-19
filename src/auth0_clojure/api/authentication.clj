@@ -1,4 +1,4 @@
-(ns auth0-clojure.core
+(ns auth0-clojure.api.authentication
   (:require [auth0-clojure.json :as json]
             [clojure.string :as string]
             [org.bovinegenius.exploding-fish :as uri]
