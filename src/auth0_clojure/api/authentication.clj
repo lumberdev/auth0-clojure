@@ -279,7 +279,7 @@
                    {:headers {authorization-header (str bearer access-token)}})]
      (client/request request))))
 
-(defn passwordless-start
+(defn- passwordless-start
   ([opts]
    (passwordless-start @global-config opts))
   ([{:as   config
@@ -303,7 +303,7 @@
      ;:auth0/authParams {:auth0/scope "openid"}
      }))
 
-(defn passwordless-verify
+(defn- passwordless-verify
   ([opts]
    (passwordless-verify @global-config opts))
   ([{:as   config
