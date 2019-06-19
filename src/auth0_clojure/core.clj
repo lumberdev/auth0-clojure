@@ -4,13 +4,6 @@
             [org.bovinegenius.exploding-fish :as uri]
             [clj-http.client :as client]))
 
-;; TODO - add spec for domains & subdomains
-(def some-default-config
-  {:auth0/default-domain "ignorabilis.auth0.com"
-   :auth0/custom-domain  "ignorabilis.auth0.com"
-   :auth0/client-id      "wWiPfXbLs3OUbR74JpXXhF9jrWi3Sgd8"
-   :auth0/client-secret  "0fkMFyofJiWinkwnl4Udcs_oAf7P4e6-WKTx8TAyC8Gh_CyrzytOylsD6bftrRoO"})
-
 (def global-config
   (atom {}))
 
@@ -28,13 +21,10 @@
   #{:openid :email})
 ;; These then get converted to a set, then to string
 ;; TODO - scope validation (if string convert to set & validate)
+;; Can add spec so that apart from scope also redirect uri is valid, state is
+;; string, etc.
 
-;; can add spec here so that redirect uri is valid,
-;; scope & state are strings, etc.
 ;; TODO - do I need ^String, ^PersistentHashMap, etc.?
-
-;; comment/uncomment this for some default config
-(set-config! some-default-config)
 
 (def https-scheme "https")
 
