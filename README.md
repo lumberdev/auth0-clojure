@@ -8,11 +8,10 @@ TODO
 
 ## TODO
 
-- Remove the original Auth0 Java lib from dependencies
 - Cleanup
 - Very basic readme
-- License
 - First alpha
+- License
 - Spec
 - Authentication API Passwordless support
 - Authentication API MFA support
