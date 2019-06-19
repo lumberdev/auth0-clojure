@@ -8,7 +8,6 @@ TODO
 
 ## TODO
 
-- Cleanup
 - Very basic readme
 - First alpha
 - License
