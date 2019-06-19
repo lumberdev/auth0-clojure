@@ -1,8 +1,8 @@
 (ns auth0-clojure.api.authentication
-  (:require [auth0-clojure.utils.json :as json]
-            [clojure.string :as string]
-            [org.bovinegenius.exploding-fish :as uri]
-            [clj-http.client :as client]))
+  (:require [auth0-clojure.utils.edn :as edn]
+            [auth0-clojure.utils.json :as json]
+            [clj-http.client :as client]
+            [org.bovinegenius.exploding-fish :as uri]))
 
 (def global-config
   (atom {}))
@@ -37,18 +37,6 @@
    (uri/map->uri {:scheme https-scheme
                   :host   (or custom-domain default-domain)})))
 
-(defn decode-underscore-key
-  [k]
-  (-> k
-      (string/replace "_" "-")
-      keyword))
-
-(defn encode-underscore-key
-  [k]
-  (-> k
-      name
-      (string/replace "-" "_")))
-
 ;; Generate query param values like `federated` with an equal sign;
 ;; it's the safe bet since Auth0 is doing the same
 (defn parse-value [k v]
@@ -77,7 +65,7 @@
           auth-url
           (param-fn
             auth-url
-            (encode-underscore-key k)
+            (edn/kw->str-val k)
             parsed-val))))
     uri
     params-map))
