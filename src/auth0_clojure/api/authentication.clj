@@ -1,6 +1,7 @@
 (ns auth0-clojure.api.authentication
   (:require [auth0-clojure.utils.edn :as edn]
             [auth0-clojure.utils.json :as json]
+            [auth0-clojure.utils.common :as common]
             [clj-http.client :as client]
             [org.bovinegenius.exploding-fish :as uri]))
 
@@ -184,17 +185,6 @@
 (def authorization-header "Authorization")
 (def bearer "Bearer ")
 
-(defn edit-if
-  "'Edits' a value in an associative structure, where k is a
-  key and f is a function that will take the old value if it exists
-  and any supplied args and return the new value, and returns a new
-  structure. If the value does not exist returns the structure supplied."
-  [m k f & args]
-  (if (contains? m k)
-    (let [val (get m k)]
-      (assoc m k (apply (partial f val) args)))
-    m))
-
 (def oauth-ks
   #{:auth0/grant-type})
 
@@ -224,7 +214,7 @@
        :accept           :json
        :as               :auth0-edn
        :throw-exceptions false}
-      (edit-if
+      (common/edit-if
         options
         :body
         (fn [body]
