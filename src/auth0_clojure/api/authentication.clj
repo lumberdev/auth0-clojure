@@ -190,7 +190,7 @@
 
 (defn oauth-vals-edn->json [body]
   (let [edn-vals  (select-keys body oauth-ks)
-        json-vals (into {} (for [[k v] edn-vals] [k (json/kw->str-val v)]))
+        json-vals (into {} (for [[k v] edn-vals] [k (edn/kw->str-val v)]))
         body      (merge body json-vals)]
     body))
 
