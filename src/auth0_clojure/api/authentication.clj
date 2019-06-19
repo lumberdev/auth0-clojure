@@ -101,7 +101,6 @@
      string-url)))
 
 ;; TODO - return-to is a MUST
-;; TODO - is setClientId from the Java version needed?
 (defn logout-url
   "Must have param: return-to
   Valid params: federated"
