@@ -2,17 +2,9 @@
   (:require [auth0-clojure.json :as json]
             [clojure.string :as string]
             [org.bovinegenius.exploding-fish :as uri]
-            [clj-http.client :as client])
-  (:import (com.auth0.client.auth AuthorizeUrlBuilder AuthAPI LogoutUrlBuilder)))
+            [clj-http.client :as client]))
 
-;; TODO - probably use ns kw, like :auth0/client-id or ::client-id
 ;; TODO - add spec for domains & subdomains
-
-(def default-domain "ignorabilis.auth0.com")
-(def custom-domain "ignorabilis.auth0.com")
-(def client-id "wWiPfXbLs3OUbR74JpXXhF9jrWi3Sgd8")
-(def client-secret "0fkMFyofJiWinkwnl4Udcs_oAf7P4e6-WKTx8TAyC8Gh_CyrzytOylsD6bftrRoO")
-
 (def some-default-config
   {:auth0/default-domain "ignorabilis.auth0.com"
    :auth0/custom-domain  "ignorabilis.auth0.com"
@@ -25,11 +17,6 @@
 (defn set-config! [new-config]
   (reset! global-config new-config))
 
-(defn auth0-auth-api []
-  (let [a0-client-id     client-id
-        a0-client-secret client-secret]
-    (AuthAPI. default-domain a0-client-id a0-client-secret)))
-
 ;; TODO - these could be exposed too
 ;; withScope should work with plain string like
 ;; "openid email profile"
@@ -41,27 +28,6 @@
   #{:openid :email})
 ;; These then get converted to a set, then to string
 ;; TODO - scope validation (if string convert to set & validate)
-(defn java-login-url [{{:keys [:redirect-to]} :params}]
-  (let [authorize-url (-> (auth0-auth-api)
-                          (.authorizeUrl "http://localhost:1111/user")
-                          (.withScope "openid"))
-        authorize-url (if redirect-to
-                        (.withState
-                          ^AuthorizeUrlBuilder authorize-url
-                          ^String redirect-to)
-                        authorize-url)]
-    (.build ^AuthorizeUrlBuilder authorize-url)))
-
-(defn java-logout-url []
-  (let [logout-builder (.logoutUrl
-                         ^AuthAPI
-                         (auth0-auth-api)
-                         "https://ignorabilis.com/login"
-                         true)
-        logout-builder (-> logout-builder
-                           (.useFederated true))
-        logout-url     (.build ^LogoutUrlBuilder logout-builder)]
-    logout-url))
 
 ;; can add spec here so that redirect uri is valid,
 ;; scope & state are strings, etc.
