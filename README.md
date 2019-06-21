@@ -46,6 +46,8 @@ Each function then accepts a request settings map and an optional config map, li
 
 In the samples below only the shorter version will be used.
 
+Each function corresponds to an Auth0 endpoint.
+
 ### URLs
 
 #### Authorize - /authorize
@@ -62,9 +64,23 @@ adding the values to the map.
      :auth0/redirect-uri  "http://localhost:1111/login-user"})
 ```
 
+#### Logout - /v2/logout
+
+Creates a logout url to log out the user.
+The `auth0/return-to-url` must be white-listed in the "Allowed Logout URLs" section
+of the Dashboard. Parameters can be added to the final URL by adding the values to the map.
+
+```clojure
+(logout-url
+    {:auth0/return-to "http://localhost:1111/login"
+     :auth0/federated true})
+```
+
 ## TODO
 
 - Samples
+- Authorize url - custom params?
+- Logout url - setClientId
 - First alpha
 - License
 - Spec
