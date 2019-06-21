@@ -25,6 +25,43 @@ Initiate the config by setting the Client (Application) details from the [dashbo
    :auth0/custom-domain  "<your-custom-domain>"})
 ```
 
+Each function then accepts a request settings map and an optional config map, like this:
+
+```clojure
+(authorize-url
+    {:auth0/response-type "code"
+     :auth0/scope         "openid profile"
+     :auth0/redirect-uri  "http://localhost:1111/login-user"})
+
+;; OR
+
+(authorize-url
+    ;; this one here needs only the client id and the custom or default domain
+    {:auth0/client-id      "<your-client-id>"
+     :auth0/custom-domain  "<your-custom-domain>"}
+    {:auth0/response-type "code"
+     :auth0/scope         "openid profile"
+     :auth0/redirect-uri  "http://localhost:1111/login-user"})
+```
+
+In the samples below only the shorter version will be used.
+
+### URLs
+
+#### Authorize - /authorize
+
+Creates an authorize url to authenticate the user with an OAuth provider.
+The `:auth0/redirect-uri` must be white-listed in the "Allowed Callback URLs" section
+of the Client (Application) Settings. Parameters can be added to the final URL by
+adding the values to the map.
+
+```clojure
+(authorize-url
+    {:auth0/response-type "code"
+     :auth0/scope         "openid profile"
+     :auth0/redirect-uri  "http://localhost:1111/login-user"})
+```
+
 ## TODO
 
 - Samples
