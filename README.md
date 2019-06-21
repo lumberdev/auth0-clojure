@@ -67,7 +67,7 @@ adding the values to the map.
 #### Logout - /v2/logout
 
 Creates a logout url to log out the user.
-The `auth0/return-to-url` must be white-listed in the "Allowed Logout URLs" section
+The `auth0/return-to` must be white-listed in the "Allowed Logout URLs" section
 of the Dashboard. Parameters can be added to the final URL by adding the values to the map.
 
 ```clojure
