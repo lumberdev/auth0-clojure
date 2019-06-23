@@ -137,6 +137,14 @@ Use this endpoint to refresh an `Access Token` using the `Refresh Token` you got
      :auth0/refresh-token "<refresh-token>"})
 ```
 
+#### /oauth/revoke - Revoke Refresh Token
+
+Creates a request to revoke an existing Refresh Token.
+
+```clojure
+(oauth-revoke {:auth0/token "<refresh-token>"})
+```
+
 #### /dbconnections/signup - Sign Up
 
 Creates a request to create a user.
