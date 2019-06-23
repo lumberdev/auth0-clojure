@@ -76,6 +76,22 @@ of the Dashboard. Parameters can be added to the final URL by adding the values 
      :auth0/federated true})
 ```
 
+### Requests
+
+#### /oauth/token
+
+##### Exchange the Authorization Code
+
+Creates a request to exchange the `code` previously obtained by calling the `/authorize` endpoint.
+The redirect URI must be the one sent in the `/authorize` call.
+
+```clojure
+(oauth-token
+    {:auth0/code         "<code>"
+     :auth0/redirect-uri "http://localhost:1111/login-user"
+     :auth0/grant-type   :auth0.grant-type/authorization-code})
+```
+
 ## TODO
 
 - Samples
