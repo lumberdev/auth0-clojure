@@ -164,6 +164,16 @@ Up to 10 additional Sign Up fields can be added to the request. This will only w
      :auth0/user-metadata {:some-key "some-val"}})
 ```
 
+#### /dbconnections/change_password - Reset Password
+
+Creates a request to reset the user's password. This will only work for db connections.
+
+```clojure
+(change-password
+    {:auth0/email      "<email>"
+     :auth0/connection "<connection>" ;; usually "Username-Password-Authentication"})
+```
+
 #### /userinfo
 
 Creates a request to get the user information associated to a given access token.
