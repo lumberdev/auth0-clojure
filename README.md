@@ -117,6 +117,16 @@ Creates a request to log in the user with `username` and `password` using the Pa
      :auth0/password     "<password>"})
 ```
 
+##### Client Credentials
+
+Creates a request to get a Token for the given Audience.
+
+```clojure
+(oauth-token
+    {:auth0/grant-type   :auth0.grant-type/client-credentials
+     :auth0/audience     "<audience>"})
+```
+
 ## TODO
 
 - Samples
