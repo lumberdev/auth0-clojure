@@ -137,6 +137,15 @@ Use this endpoint to refresh an `Access Token` using the `Refresh Token` you got
      :auth0/refresh-token "<refresh-token>"})
 ```
 
+#### /userinfo
+
+Creates a request to get the user information associated to a given access token.
+This will only work if the token has been granted the `openid` scope.
+
+```clojure
+(userinfo "<access-token>")
+```
+
 ## TODO
 
 - Samples
