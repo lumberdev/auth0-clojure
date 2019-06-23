@@ -105,6 +105,18 @@ The connection used is the one defined as "Default Directory" in the account set
      :auth0/password     "<password>"})
 ```
 
+##### Log In with Password Realm
+
+Creates a request to log in the user with `username` and `password` using the Password Realm.
+
+```clojure
+(oauth-token
+    {:auth0/grant-type   "http://auth0.com/oauth/grant-type/password-realm"
+     :auth0/realm        "<realm>" ;; like "Username-Password-Authentication"
+     :auth0/username     "<username>"
+     :auth0/password     "<password>"})
+```
+
 ## TODO
 
 - Samples
