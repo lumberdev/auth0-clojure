@@ -87,9 +87,21 @@ The redirect URI must be the one sent in the `/authorize` call.
 
 ```clojure
 (oauth-token
-    {:auth0/code         "<code>"
-     :auth0/redirect-uri "http://localhost:1111/login-user"
-     :auth0/grant-type   :auth0.grant-type/authorization-code})
+    {:auth0/grant-type   :auth0.grant-type/authorization-code
+     :auth0/code         "<code>"
+     :auth0/redirect-uri "http://localhost:1111/login-user"})
+```
+
+##### Log In with Password
+
+Creates a request to log in the user with `username` and `password`.
+The connection used is the one defined as "Default Directory" in the account settings.
+
+```clojure
+(oauth-token
+    {:auth0/grant-type   :auth0.grant-type/password
+     :auth0/username     "<username>"
+     :auth0/password     "<password>"})
 ```
 
 ## TODO
