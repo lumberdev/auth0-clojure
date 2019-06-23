@@ -119,7 +119,7 @@ Creates a request to log in the user with `username` and `password` using the Pa
 
 ##### Client Credentials
 
-Creates a request to get a Token for the given Audience.
+Creates a request to get a `Token` for the given `Audience`.
 
 ```clojure
 (oauth-token
@@ -139,7 +139,7 @@ Use this endpoint to refresh an `Access Token` using the `Refresh Token` you got
 
 #### /oauth/revoke - Revoke Refresh Token
 
-Creates a request to revoke an existing Refresh Token.
+Creates a request to revoke an existing `Refresh Token`.
 
 ```clojure
 (oauth-revoke {:auth0/token "<refresh-token>"})
