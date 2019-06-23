@@ -137,6 +137,33 @@ Use this endpoint to refresh an `Access Token` using the `Refresh Token` you got
      :auth0/refresh-token "<refresh-token>"})
 ```
 
+#### /dbconnections/signup - Sign Up
+
+Creates a request to create a user.
+Up to 10 additional Sign Up fields can be added to the request. This will only work for db connections.
+
+```clojure
+;; minimal
+(sign-up
+    {:auth0/email      "<email>"
+     :auth0/password   "<password>"
+     :auth0/connection "<connection>" ;; usually "Username-Password-Authentication"
+     })
+
+;; all
+(sign-up
+    {:auth0/email         "<email>"
+     :auth0/password      "<password>"
+     :auth0/connection    "<connection>" ;; usually "Username-Password-Authentication"
+     :auth0/username      "<username>"
+     :auth0/given-name    "<first-name>"
+     :auth0/family-name   "<last-name>"
+     :auth0/name          "<full-name>"
+     :auth0/nickname      "<nick>"
+     :auth0/picture       "<image-url>"
+     :auth0/user-metadata {:some-key "some-val"}})
+```
+
 #### /userinfo
 
 Creates a request to get the user information associated to a given access token.
