@@ -51,7 +51,7 @@ Note that when using keywords hyphens to underscores conversion is done automati
 
 ### URLs
 
-#### Authorize - /authorize
+#### /authorize - Authorize
 
 Creates an authorize url to authenticate the user with an OAuth provider.
 The `:auth0/redirect-uri` must be white-listed in the "Allowed Callback URLs" section
@@ -65,7 +65,7 @@ adding the values to the map.
      :auth0/redirect-uri  "http://localhost:1111/login-user"})
 ```
 
-#### Logout - /v2/logout
+#### /v2/logout - Logout
 
 Creates a logout url to log out the user.
 The `auth0/return-to` must be white-listed in the "Allowed Logout URLs" section
@@ -174,7 +174,7 @@ Creates a request to reset the user's password. This will only work for db conne
      :auth0/connection "<connection>" ;; usually "Username-Password-Authentication"})
 ```
 
-#### /userinfo
+#### /userinfo - User Info
 
 Creates a request to get the user information associated to a given access token.
 This will only work if the token has been granted the `openid` scope.
