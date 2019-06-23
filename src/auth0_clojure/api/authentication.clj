@@ -200,13 +200,13 @@
 
 ;; TODO - move this in a different ns
 (defn auth0-request [config path options]
-  (let [base-url      (base-url
-                        (select-keys
-                          config
-                          [:auth0/default-domain
-                           :auth0/custom-domain]))
-        user-info-url (uri/path base-url path)
-        string-url    (-> user-info-url uri/uri->map uri/map->string)]
+  (let [base-url    (base-url
+                      (select-keys
+                        config
+                        [:auth0/default-domain
+                         :auth0/custom-domain]))
+        request-url (uri/path base-url path)
+        string-url  (-> request-url uri/uri->map uri/map->string)]
     (merge
       ;; TODO - getting EDN is cool, but in some cases JSON might be preferable - make this configurable
       {:url              string-url
@@ -271,9 +271,9 @@
      (client/request request))))
 
 ;; TODO - access-token is a MUST - needs spec
-(defn user-info
+(defn userinfo
   ([access-token]
-   (user-info @global-config access-token))
+   (userinfo @global-config access-token))
   ([config access-token]
    (let [request (auth0-request
                    config
