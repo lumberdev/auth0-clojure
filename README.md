@@ -193,7 +193,6 @@ This will only work if the token has been granted the `openid` scope.
 
 ## TODO
 
-- Samples
 - Authorize url - custom params?
 - Logout url - setClientId
 - First alpha
