@@ -127,6 +127,16 @@ Creates a request to get a Token for the given Audience.
      :auth0/audience     "<audience>"})
 ```
 
+##### Refresh Token
+
+Use this endpoint to refresh an `Access Token` using the `Refresh Token` you got during authorization.
+
+```clojure
+(oauth-token
+    {:auth0/grant-type    :auth0.grant-type/refresh-token
+     :auth0/refresh-token "<refresh-token>"})
+```
+
 ## TODO
 
 - Samples
