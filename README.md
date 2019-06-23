@@ -45,8 +45,9 @@ Each function then accepts a request settings map and an optional config map, li
 ```
 
 In the samples below only the shorter version will be used.
-
-Each function corresponds to an Auth0 endpoint.
+Each function corresponds to an Auth0 endpoint. Keyword values like `:auth0.grant-type/authorization-code`
+are used for convenience; strings like `"authorization_code"` are also acceptable.
+Note that when using keywords hyphens to underscores conversion is done automatically for you.
 
 ### URLs
 
