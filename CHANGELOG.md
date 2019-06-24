@@ -13,5 +13,5 @@
 ### Added
 - First working version of the library.
 
-[Unreleased]: https://github.com/your-name/auth0-clojure/compare/0.1.0...HEAD
-[0.1.0]: https://github.com/your-name/auth0-clojure/compare/0.1.0-SNAPSHOT...0.1.0
+[Unreleased]: https://github.com/ignorabilis/auth0-clojure/compare/0.1.0...HEAD
+[0.1.0]: https://github.com/ignorabilis/auth0-clojure/compare/0.1.0-SNAPSHOT...0.1.0
