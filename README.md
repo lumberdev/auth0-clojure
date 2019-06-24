@@ -5,7 +5,7 @@ Clojure client library for the [Auth0](https://auth0.com)  platform (Authenticat
 ## Download
 
 ```clojure
-[ignorabilis/auth0-clojure "0.1.0-SNAPSHOT"]
+[auth0-clojure "0.1.0"]
 ```
 
 ## Authentication API
