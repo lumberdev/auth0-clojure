@@ -320,9 +320,9 @@
                               opts)})]
      (client/request request))))
 
-(defn sign-up
+(defn signup
   ([opts]
-   (sign-up @global-config opts))
+   (signup @global-config opts))
   ([{:as   config
      :keys [:auth0/client-id]}
     opts]
@@ -338,13 +338,13 @@
 (comment
 
   ;; minimal
-  (sign-up
+  (signup
     {:auth0/email      "irina@lumberdev.nyc"
      :auth0/password   "123"
      :auth0/connection "Username-Password-Authentication"})
 
   ;; all
-  (sign-up
+  (signup
     {:auth0/email         "irina@lumberdev.nyc"
      :auth0/password      "123"
      :auth0/connection    "Username-Password-Authentication"

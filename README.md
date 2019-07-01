@@ -152,14 +152,14 @@ Up to 10 additional Sign Up fields can be added to the request. This will only w
 
 ```clojure
 ;; minimal
-(sign-up
+(signup
     {:auth0/email      "<email>"
      :auth0/password   "<password>"
      :auth0/connection "<connection>" ;; usually "Username-Password-Authentication"
      })
 
 ;; all
-(sign-up
+(signup
     {:auth0/email         "<email>"
      :auth0/password      "<password>"
      :auth0/connection    "<connection>" ;; usually "Username-Password-Authentication"
