@@ -5,25 +5,13 @@
             [clj-http.client :as client]
             [org.bovinegenius.exploding-fish :as uri]))
 
+;; TODO - do I need ^String, ^PersistentHashMap, etc.?
+
 (def global-config
   (atom {}))
 
 (defn set-config! [new-config]
   (reset! global-config new-config))
-
-;; TODO - these could be exposed too
-;; scope should work with plain string like
-;; "openid email profile"
-;; or with a set or vector of strings/keywords, like this:
-(comment
-  [:auth0.scope/openid :auth0.scope/email]
-  #{:auth0.scope/openid :auth0.scope/profile}
-  ;alternatives
-  #{:openid :email})
-;; These then get converted to a set, then to string
-;; TODO - scope validation (if string convert to set & validate)
-
-;; TODO - do I need ^String, ^PersistentHashMap, etc.?
 
 (def https-scheme "https")
 
