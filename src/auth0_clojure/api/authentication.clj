@@ -102,7 +102,6 @@
      string-url)))
 
 ;; TODO - return-to is a MUST
-;; TODO - setClientId
 (defn logout-url
   "Must have param: return-to
   Valid params: federated"

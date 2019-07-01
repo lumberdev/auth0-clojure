@@ -194,7 +194,6 @@ This will only work if the token has been granted the `openid` scope.
 ## TODO
 
 - Authorize url - custom params?
-- Logout url - setClientId
 - First alpha
 - License
 - Spec
@@ -202,7 +201,7 @@ This will only work if the token has been granted the `openid` scope.
 - Authentication API MFA support
 - Authentication API WS-Federation support
 - Handle values like `openid`, `email`, `authorization-code`, etc.; check the OpenID standards for an exhaustive list
-- Detailed samples
+- More samples
 - Management API
 - Default utility that handles Management API token refreshes
 - Tests
