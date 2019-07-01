@@ -115,14 +115,14 @@
   Valid params: federated"
   ([params]
    (logout-url @global-config params))
-  ([config params]
+  ([config {:as params :keys [:auth0/set-client-id]}]
    (let [base-url         (base-url config)
          logout-url       (uri/path base-url "/v2/logout")
          param-logout-url (build-url-params
                             logout-url
                             (merge
                               (select-keys params [:auth0/return-to :auth0/federated])
-                              (select-keys config [:auth0/client-id])))
+                              (when set-client-id (select-keys config [:auth0/client-id]))))
          string-url       (-> param-logout-url uri/uri->map uri/map->string)]
      string-url)))
 
