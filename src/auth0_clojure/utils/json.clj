@@ -20,6 +20,6 @@
                                  -1 nil
                                  (do (.reset br)
                                      ;; TODO - use parse-stream-strict?
-                                     (json/parse-stream br (partial edn/str-val->kw "auth0")))))
+                                     (json/parse-stream br (partial edn/str-val->kw (name :auth0))))))
                              (finally (.close br)))]
     (assoc resp :body json-body)))
