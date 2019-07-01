@@ -193,7 +193,6 @@ This will only work if the token has been granted the `openid` scope.
 
 ## TODO
 
-- License
 - Spec
 - First alpha
 - Authentication API Passwordless support
