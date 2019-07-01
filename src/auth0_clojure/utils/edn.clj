@@ -32,13 +32,18 @@
       (scope-kw (name sc-val)))
     scope))
 
-(defn parse-scope [scope]
-  (if (string? scope)
-    (map
-      (fn [sc-val]
-        (scope-kw sc-val))
-      (string/split scope #"s"))
-    (ensure-ns scope)))
+(defn parse-scope
+  "Convert scope to kw set."
+  [scope]
+  (set
+    (if (string? scope)
+      (map
+        (fn [sc-val]
+          (scope-kw sc-val))
+        (string/split scope #"s"))
+      (ensure-ns scope))))
 
-(defn unparse-scope [scope-coll]
+(defn unparse-scope
+  "Convert scope to string"
+  [scope-coll]
   (string/join " " (map name scope-coll)))
