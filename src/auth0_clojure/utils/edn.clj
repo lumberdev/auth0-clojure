@@ -32,6 +32,14 @@
       (scope-kw (name sc-val)))
     scope))
 
+(comment
+  ;; possible parse values
+  [:auth0.scope/openid :auth0.scope/email]
+  #{:auth0.scope/openid :auth0.scope/email}
+  ;alternatives
+  #{:openid :email}
+  "openid email")
+
 (defn parse-scope
   "Convert scope to kw set."
   [scope]
