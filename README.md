@@ -193,10 +193,9 @@ This will only work if the token has been granted the `openid` scope.
 
 ## TODO
 
-- Authorize url - custom params?
-- First alpha
 - License
 - Spec
+- First alpha
 - Authentication API Passwordless support
 - Authentication API MFA support
 - Authentication API WS-Federation support
