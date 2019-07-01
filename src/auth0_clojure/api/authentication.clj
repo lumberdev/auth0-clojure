@@ -84,19 +84,27 @@
 ;; TODO - redirect-uri is a MUST
 ;; TODO - check if the same is valid for scope: openid
 ;; TODO - spec for valid keys here: scope, state, audience, connection, response-type
-;; TODO - make adding custom params via :auth0/params
+;; TODO - spec for valid keys here: scope, state, audience, connection, response-type
 (defn authorize-url
   "Must have param: redirect-uri
   Valid params: connection audience scope state response-type"
   ([params]
    (authorize-url @global-config params))
-  ([config params]
+  ([config {:as params custom-params :auth0/params}]
    (let [base-url       (base-url config)
          auth-url       (uri/path base-url "/authorize")
          param-auth-url (build-url-params
                           auth-url
                           (merge
-                            params
+                            (select-keys
+                              params
+                              [:auth0/redirect-uri
+                               :auth0/scope
+                               :auth0/state
+                               :auth0/audience
+                               :auth0/connection
+                               :auth0/response-type])
+                            custom-params
                             (select-keys config [:auth0/client-id])))
          string-url     (-> param-auth-url uri/uri->map uri/map->string)]
      string-url)))
@@ -113,7 +121,7 @@
          param-logout-url (build-url-params
                             logout-url
                             (merge
-                              params
+                              (select-keys params [:auth0/return-to :auth0/federated])
                               (select-keys config [:auth0/client-id])))
          string-url       (-> param-logout-url uri/uri->map uri/map->string)]
      string-url)))
