@@ -12,7 +12,7 @@
   (reset! global-config new-config))
 
 ;; TODO - these could be exposed too
-;; withScope should work with plain string like
+;; scope should work with plain string like
 ;; "openid email profile"
 ;; or with a set or vector of strings/keywords, like this:
 (comment
@@ -22,8 +22,6 @@
   #{:openid :email})
 ;; These then get converted to a set, then to string
 ;; TODO - scope validation (if string convert to set & validate)
-;; Can add spec so that apart from scope also redirect uri is valid, state is
-;; string, etc.
 
 ;; TODO - do I need ^String, ^PersistentHashMap, etc.?
 
@@ -90,21 +88,26 @@
   Valid params: connection audience scope state response-type"
   ([params]
    (authorize-url @global-config params))
-  ([config {:as params custom-params :auth0/params}]
+  ([config
+    {:as           params
+     :keys         [:auth0/scope]
+     custom-params :auth0/params}]
    (let [base-url       (base-url config)
          auth-url       (uri/path base-url "/authorize")
+         scope          (edn/parse-scope scope)
+         ;; TODO - validate scope here
          param-auth-url (build-url-params
                           auth-url
                           (merge
                             (select-keys
                               params
                               [:auth0/redirect-uri
-                               :auth0/scope
                                :auth0/state
                                :auth0/audience
                                :auth0/connection
                                :auth0/response-type])
                             custom-params
+                            {:auth0/scope (edn/unparse-scope scope)}
                             (select-keys config [:auth0/client-id])))
          string-url     (-> param-auth-url uri/uri->map uri/map->string)]
      string-url)))
@@ -309,6 +312,7 @@
     {:auth0/connection "email"
      :auth0/email      "irina.yaroslavova@ignorabilis.com"
      ;:auth0/send       "link"           ;; can be link/code
+     ;; TODO - validate this nested scope as well
      ;:auth0/authParams {:auth0/scope "openid"}
      }))
 
