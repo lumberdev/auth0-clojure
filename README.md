@@ -193,14 +193,14 @@ This will only work if the token has been granted the `openid` scope.
 
 ## TODO
 
+- Handle values like `openid`, `email`, `authorization-code`, etc.; check the OpenID standards for an exhaustive list
 - Spec
 - First alpha
+- Management API
 - Authentication API Passwordless support
 - Authentication API MFA support
 - Authentication API WS-Federation support
-- Handle values like `openid`, `email`, `authorization-code`, etc.; check the OpenID standards for an exhaustive list
-- More samples
-- Management API
+- More samples (for Auth API, the above 3)
 - Default utility that handles Management API token refreshes
 - Tests
 
