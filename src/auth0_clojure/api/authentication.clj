@@ -70,7 +70,6 @@
 ;; TODO - redirect-uri is a MUST
 ;; TODO - check if the same is valid for scope: openid
 ;; TODO - spec for valid keys here: scope, state, audience, connection, response-type
-;; TODO - spec for valid keys here: scope, state, audience, connection, response-type
 (defn authorize-url
   "Must have param: redirect-uri
   Valid params: connection audience scope state response-type"
