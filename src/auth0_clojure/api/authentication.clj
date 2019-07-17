@@ -122,11 +122,6 @@
 
   (saml-metadata-url))
 
-;; requests start from here
-
-(def authorization-header "Authorization")
-(def bearer "Bearer ")
-
 (comment
   ;; TODO - make each request return the actual map and force this pattern:
   (auth/request
@@ -194,7 +189,7 @@
    (let [request (requests/auth0-request
                    config
                    "/userinfo"
-                   {:headers {authorization-header (str bearer access-token)}})]
+                   {:headers (requests/bearer-header access-token)})]
      (client/request request))))
 
 (defn- passwordless-start

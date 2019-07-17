@@ -6,6 +6,12 @@
             [clj-http.client :as client]
             [org.bovinegenius.exploding-fish :as uri]))
 
+(def authorization-header "Authorization")
+(def bearer "Bearer ")
+
+(defn bearer-header [access-token]
+  {authorization-header (str bearer access-token)})
+
 (def oauth-ks
   #{:auth0/grant-type})
 
