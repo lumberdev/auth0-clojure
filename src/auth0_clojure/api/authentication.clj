@@ -2,8 +2,7 @@
   (:require [auth0-clojure.utils.edn :as edn]
             [auth0-clojure.utils.urls :as urls]
             [auth0-clojure.utils.requests :as requests]
-            [clj-http.client :as client]
-            [org.bovinegenius.exploding-fish :as uri]))
+            [clj-http.client :as client]))
 
 ;; TODO - do I need ^String, ^PersistentHashMap, etc.?
 
@@ -25,25 +24,19 @@
     {:as           params
      :keys         [:auth0/scope]
      custom-params :auth0/params}]
-   (let [base-url       (urls/base-url config)
-         auth-url       (uri/path base-url "/authorize")
-         scope          (edn/parse-scope scope)
-         ;; TODO - validate scope here
-         param-auth-url (urls/build-url-params
-                          auth-url
-                          (merge
-                            (select-keys
-                              params
-                              [:auth0/redirect-uri
-                               :auth0/state
-                               :auth0/audience
-                               :auth0/connection
-                               :auth0/response-type])
-                            custom-params
-                            {:auth0/scope (edn/unparse-scope scope)}
-                            (select-keys config [:auth0/client-id])))
-         string-url     (-> param-auth-url uri/uri->map uri/map->string)]
-     string-url)))
+   (let [scope  (edn/parse-scope scope)
+         params (merge
+                  (select-keys
+                    params
+                    [:auth0/redirect-uri
+                     :auth0/state
+                     :auth0/audience
+                     :auth0/connection
+                     :auth0/response-type])
+                  custom-params
+                  {:auth0/scope (edn/unparse-scope scope)}
+                  (select-keys config [:auth0/client-id]))]
+     (urls/build-auth0-url config "/authorize" params))))
 
 ;; TODO - return-to is a MUST
 (defn logout-url
@@ -52,15 +45,10 @@
   ([params]
    (logout-url @global-config params))
   ([config {:as params :keys [:auth0/set-client-id]}]
-   (let [base-url         (urls/base-url config)
-         logout-url       (uri/path base-url "/v2/logout")
-         param-logout-url (urls/build-url-params
-                            logout-url
-                            (merge
-                              (select-keys params [:auth0/return-to :auth0/federated])
-                              (when set-client-id (select-keys config [:auth0/client-id]))))
-         string-url       (-> param-logout-url uri/uri->map uri/map->string)]
-     string-url)))
+   (let [params (merge
+                  (select-keys params [:auth0/return-to :auth0/federated])
+                  (when set-client-id (select-keys config [:auth0/client-id])))]
+     (urls/build-auth0-url config "/v2/logout" params))))
 
 (comment
 
@@ -81,21 +69,14 @@
   ([{:as   config
      :keys [:auth0/client-id]}
     params]
-   (let [base-url       (urls/base-url config)
-         saml-url       (uri/path base-url (str "/samlp/" client-id))
-         param-saml-url (urls/build-url-params saml-url params)
-         string-url     (-> param-saml-url uri/uri->map uri/map->string)]
-     string-url)))
+   (urls/build-auth0-url config (str "/samlp/" client-id) params)))
 
 (defn saml-metadata-url
   ([]
    (saml-metadata-url @global-config))
   ([{:as   config
      :keys [:auth0/client-id]}]
-   (let [base-url   (urls/base-url config)
-         saml-url   (uri/path base-url (str "/samlp/metadata/" client-id))
-         string-url (-> saml-url uri/uri->map uri/map->string)]
-     string-url)))
+   (urls/build-auth0-url config (str "/samlp/metadata/" client-id))))
 
 ;; providing a connection is optional;
 ;; no connection -> SP initiated url
@@ -104,11 +85,7 @@
   ([params]
    (sp-idp-init-flow-url @global-config params))
   ([config params]
-   (let [base-url       (urls/base-url config)
-         saml-url       (uri/path base-url "/login/callback")
-         param-saml-url (urls/build-url-params saml-url params)
-         string-url     (-> param-saml-url uri/uri->map uri/map->string)]
-     string-url)))
+   (urls/build-auth0-url config "/login/callback" params)))
 
 (comment
 

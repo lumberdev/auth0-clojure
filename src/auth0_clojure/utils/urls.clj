@@ -52,3 +52,13 @@
         params-uri     (build-url-params-base uri params-map)
         raw-params-uri (build-url-params-base params-uri raw-params-map)]
     raw-params-uri))
+
+(defn build-auth0-url
+  ([config path]
+   (build-auth0-url config path nil))
+  ([config path params]
+   (let [base-url       (base-url config)
+         path-url       (uri/path base-url path)
+         param-url      (if params (build-url-params path-url params) path-url)
+         string-url     (-> param-url uri/uri->map uri/map->string)]
+     string-url)))
