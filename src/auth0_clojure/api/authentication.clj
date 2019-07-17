@@ -1,7 +1,7 @@
 (ns auth0-clojure.api.authentication
   (:require [auth0-clojure.utils.edn :as edn]
-            [auth0-clojure.utils.json :as json]
-            [auth0-clojure.utils.common :as common]
+            [auth0-clojure.utils.urls :as urls]
+            [auth0-clojure.utils.requests :as requests]
             [clj-http.client :as client]
             [org.bovinegenius.exploding-fish :as uri]))
 
@@ -12,60 +12,6 @@
 
 (defn set-config! [new-config]
   (reset! global-config new-config))
-
-(def https-scheme "https")
-
-;; TODO - memoize base-url based on default & custom domains
-(defn base-url
-  ([]
-   (base-url @global-config))
-  ([{:keys [:auth0/default-domain
-            :auth0/custom-domain]}]
-   (uri/map->uri {:scheme https-scheme
-                  :host   (or custom-domain default-domain)})))
-
-;; Generate query param values like `federated` with an equal sign;
-;; it's the safe bet since Auth0 is doing the same
-(defn parse-value [k v]
-  (case k
-    :auth0/federated (when v "")
-    v))
-
-(def raw-param-ks
-  #{:auth0/redirect-uri})
-
-(defn param-key->param-fn
-  "Some query parameters should be raw, depending on the key."
-  [param-key]
-  (if (contains? raw-param-ks param-key)
-    uri/param-raw
-    uri/param))
-
-(defn build-url-params-base [uri params-map]
-  (reduce
-    (fn [auth-url [k v]]
-      (let [parsed-val (parse-value k v)
-            param-fn   (param-key->param-fn k)]
-        ;; remove any nil values, otherwise they get added to query params without an equal sign
-        ;; for example {:federated nil} -> ... &federated&some_other=1 ...
-        (if (nil? parsed-val)
-          auth-url
-          (param-fn
-            auth-url
-            (edn/kw->str-val k)
-            parsed-val))))
-    uri
-    params-map))
-
-(defn build-url-params [uri params-map]
-  ;; TODO - adding raw params in the end is a workaround for that issue:
-  ;; https://github.com/wtetzner/exploding-fish/issues/26
-  ;; revert once it is fixed
-  (let [raw-params-map (select-keys params-map raw-param-ks)
-        params-map     (apply dissoc params-map raw-param-ks)
-        params-uri     (build-url-params-base uri params-map)
-        raw-params-uri (build-url-params-base params-uri raw-params-map)]
-    raw-params-uri))
 
 ;; TODO - redirect-uri is a MUST
 ;; TODO - check if the same is valid for scope: openid
@@ -79,11 +25,11 @@
     {:as           params
      :keys         [:auth0/scope]
      custom-params :auth0/params}]
-   (let [base-url       (base-url config)
+   (let [base-url       (urls/base-url config)
          auth-url       (uri/path base-url "/authorize")
          scope          (edn/parse-scope scope)
          ;; TODO - validate scope here
-         param-auth-url (build-url-params
+         param-auth-url (urls/build-url-params
                           auth-url
                           (merge
                             (select-keys
@@ -106,9 +52,9 @@
   ([params]
    (logout-url @global-config params))
   ([config {:as params :keys [:auth0/set-client-id]}]
-   (let [base-url         (base-url config)
+   (let [base-url         (urls/base-url config)
          logout-url       (uri/path base-url "/v2/logout")
-         param-logout-url (build-url-params
+         param-logout-url (urls/build-url-params
                             logout-url
                             (merge
                               (select-keys params [:auth0/return-to :auth0/federated])
@@ -127,8 +73,6 @@
     {:auth0/return-to "http://localhost:1111/login"
      :auth0/federated true}))
 
-;; TODO - refactor in utils, urls, requests
-
 ;; SAML
 ;; the only param is connection and it is optional
 (defn accept-saml-url
@@ -137,9 +81,9 @@
   ([{:as   config
      :keys [:auth0/client-id]}
     params]
-   (let [base-url       (base-url config)
+   (let [base-url       (urls/base-url config)
          saml-url       (uri/path base-url (str "/samlp/" client-id))
-         param-saml-url (build-url-params saml-url params)
+         param-saml-url (urls/build-url-params saml-url params)
          string-url     (-> param-saml-url uri/uri->map uri/map->string)]
      string-url)))
 
@@ -148,7 +92,7 @@
    (saml-metadata-url @global-config))
   ([{:as   config
      :keys [:auth0/client-id]}]
-   (let [base-url   (base-url config)
+   (let [base-url   (urls/base-url config)
          saml-url   (uri/path base-url (str "/samlp/metadata/" client-id))
          string-url (-> saml-url uri/uri->map uri/map->string)]
      string-url)))
@@ -160,9 +104,9 @@
   ([params]
    (sp-idp-init-flow-url @global-config params))
   ([config params]
-   (let [base-url       (base-url config)
+   (let [base-url       (urls/base-url config)
          saml-url       (uri/path base-url "/login/callback")
-         param-saml-url (build-url-params saml-url params)
+         param-saml-url (urls/build-url-params saml-url params)
          string-url     (-> param-saml-url uri/uri->map uri/map->string)]
      string-url)))
 
@@ -183,43 +127,6 @@
 (def authorization-header "Authorization")
 (def bearer "Bearer ")
 
-(def oauth-ks
-  #{:auth0/grant-type})
-
-(defn oauth-vals-edn->json [body]
-  (let [edn-vals  (select-keys body oauth-ks)
-        json-vals (into {} (for [[k v] edn-vals] [k (edn/kw->str-val v)]))
-        body      (merge body json-vals)]
-    body))
-
-(defmethod client/coerce-response-body :auth0-edn [_ resp]
-  (json/coerce-responce-body-to-auth0-edn resp))
-
-;; TODO - move this in a different ns
-(defn auth0-request [config path options]
-  (let [base-url    (base-url
-                      (select-keys
-                        config
-                        [:auth0/default-domain
-                         :auth0/custom-domain]))
-        request-url (uri/path base-url path)
-        string-url  (-> request-url uri/uri->map uri/map->string)]
-    (merge
-      ;; TODO - getting EDN is cool, but in some cases JSON might be preferable - make this configurable
-      {:url              string-url
-       :method           :get
-       :content-type     :json
-       :accept           :json
-       :as               :auth0-edn
-       :throw-exceptions false}
-      (common/edit-if
-        options
-        :body
-        (fn [body]
-          (-> body
-              oauth-vals-edn->json
-              json/edn->json))))))
-
 (comment
   ;; TODO - make each request return the actual map and force this pattern:
   (auth/request
@@ -239,7 +146,7 @@
   ([{:as   config
      :keys [:auth0/client-id :auth0/client-secret]}
     opts]
-   (let [request (auth0-request
+   (let [request (requests/auth0-request
                    config
                    "/oauth/token"
                    {:method :post
@@ -269,7 +176,7 @@
      :keys [:auth0/client-id
             :auth0/client-secret]}
     opts]
-   (let [request (auth0-request
+   (let [request (requests/auth0-request
                    config
                    "/oauth/revoke"
                    {:method :post
@@ -284,7 +191,7 @@
   ([access-token]
    (userinfo @global-config access-token))
   ([config access-token]
-   (let [request (auth0-request
+   (let [request (requests/auth0-request
                    config
                    "/userinfo"
                    {:headers {authorization-header (str bearer access-token)}})]
@@ -296,7 +203,7 @@
   ([{:as   config
      :keys [:auth0/client-id]}
     opts]
-   (let [request (auth0-request
+   (let [request (requests/auth0-request
                    config
                    "/passwordless/start"
                    {:method :post
@@ -321,7 +228,7 @@
   ([{:as   config
      :keys [:auth0/client-id]}
     opts]
-   (let [request (auth0-request
+   (let [request (requests/auth0-request
                    config
                    "/passwordless/verify"
                    {:method :post
@@ -336,7 +243,7 @@
   ([{:as   config
      :keys [:auth0/client-id]}
     opts]
-   (let [request (auth0-request
+   (let [request (requests/auth0-request
                    config
                    "/dbconnections/signup"
                    {:method :post
@@ -374,7 +281,7 @@
   ([{:as   config
      :keys [:auth0/client-id]}
     opts]
-   (let [request (auth0-request
+   (let [request (requests/auth0-request
                    config
                    "/dbconnections/change_password"
                    {:method :post
@@ -397,7 +304,7 @@
      :keys [:auth0/client-id]}
     {:as   opts
      :keys [:auth0/redirect-uris]}]
-   (let [request (auth0-request
+   (let [request (requests/auth0-request
                    config
                    "/oidc/register"
                    {:method :post
