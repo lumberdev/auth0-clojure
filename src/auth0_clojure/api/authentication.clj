@@ -220,6 +220,18 @@
               oauth-vals-edn->json
               json/edn->json))))))
 
+(comment
+  ;; TODO - make each request return the actual map and force this pattern:
+  (auth/request
+    (auth/oauth-token
+      {:auth0/code         "CODE_HERE"
+       :auth0/redirect-uri "http://localhost:1111/"
+       :auth0/grant-type   :auth0.grant-type/authorization-code}))
+  ;; the rationale being that one can examine the actual request being made
+  ;; if only auth/oauth-token is being called
+  ;; it is also easier for testing
+  )
+
 ;; TODO - spec the map later
 (defn oauth-token
   ([opts]
