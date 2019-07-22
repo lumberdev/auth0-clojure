@@ -1,9 +1,16 @@
 (ns auth0-clojure.utils.api)
 
 (def api-description-test
-  {:a {:name        :get-connection
-       :description "local"
-       :method      :get}})
+  {:get-connection    {:description "Gets a connection"
+                       :path        ["connections" :id]
+                       :method      :get}
+   :update-connection {:description "Updates a connection"
+                       :path        ["connections" :id]
+                       :method      :patch
+                       :body        {}
+                       ;; TODO - implement body validation
+                       ;:body-validation nil
+                       :headers     {:custom "random"}}})
 
 (defn create-api-call [[_ {:keys [:name :description :method]}]]
   (let []
