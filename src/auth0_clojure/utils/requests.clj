@@ -38,7 +38,12 @@
        :method           :get
        :content-type     :json
        :accept           :json
+       ;; TODO - there seems to be an issue with the client in decode-json-body
+       ;; when the json returned is not an object but an array
+       ;; :as :json         - throws exception
+       ;; :as :json-strict  - does not throw exception
        :as               :auth0-edn
+       ;:as               :json-strict
        :throw-exceptions false}
       (common/edit-if
         options
