@@ -4,7 +4,8 @@
             [auth0-clojure.utils.edn :as edn]
             [auth0-clojure.utils.urls :as urls]
             [clj-http.client :as client]
-            [org.bovinegenius.exploding-fish :as uri]))
+            [org.bovinegenius.exploding-fish :as uri]
+            [clojure.string :as string]))
 
 (def authorization-header "Authorization")
 (def bearer "Bearer ")
@@ -61,3 +62,12 @@
       (merge
         options
         {:headers (bearer-header access-token)}))))
+
+(defn auth0-mgmt-request [{:keys [:auth0/mgmt-access-token] :as config} path options]
+  (let [mgmt-path (str "/" (string/join "/" (concat ["api" "v2"] path)))]
+    (auth0-request
+      config
+      mgmt-path
+      (merge
+        options
+        {:headers (bearer-header mgmt-access-token)}))))
