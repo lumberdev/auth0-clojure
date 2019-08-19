@@ -193,9 +193,9 @@ This will only work if the token has been granted the `openid` scope.
 
 ## TODO
 
+- Management API
 - Spec (+ `openid`, `email`, `authorization-code`)
 - First alpha
-- Management API
 - Authentication API Passwordless support
 - Authentication API MFA support
 - Authentication API WS-Federation support
