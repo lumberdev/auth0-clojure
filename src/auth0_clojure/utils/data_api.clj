@@ -25,7 +25,7 @@
 (defn invoke-base [{:keys [:api-descriptor]
                     :as config}
                    {:keys [:operation
-                           :params
+                           :path-params
                            :body]}]
   (let [api-descriptor (api-descriptor-resolver api-descriptor)
         {{:keys [method path headers]} :http} (operation-resolver api-descriptor operation)
@@ -33,7 +33,7 @@
         path        (map
                       #(if (keyword? %)
                          ;; TODO - throw exception if no such param???
-                         (get params %)
+                         (get path-params %)
                          %)
                       path)
         path        (str path-prefix (string/join "/" path))
