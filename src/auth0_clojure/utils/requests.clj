@@ -4,8 +4,7 @@
             [auth0-clojure.utils.edn :as edn]
             [auth0-clojure.utils.urls :as urls]
             [clj-http.client :as client]
-            [org.bovinegenius.exploding-fish :as uri]
-            [clojure.string :as string]))
+            [org.bovinegenius.exploding-fish :as uri]))
 
 (def authorization-header "Authorization")
 (def bearer "Bearer ")
@@ -23,7 +22,7 @@
     body))
 
 (defmethod client/coerce-response-body :auth0-edn [_ resp]
-  (json/coerce-responce-body-to-auth0-edn resp))
+  (json/coerce-response-body-to-auth0-edn resp))
 
 (defn auth0-request [config path options]
   (let [base-url    (urls/base-url
@@ -39,12 +38,7 @@
        :method           :get
        :content-type     :json
        :accept           :json
-       ;; TODO - there seems to be an issue with the client in decode-json-body
-       ;; when the json returned is not an object but an array
-       ;; :as :json         - throws exception
-       ;; :as :json-strict  - does not throw exception
        :as               :auth0-edn
-       ;:as               :json-strict
        :throw-exceptions false}
       (common/edit-if
         options
