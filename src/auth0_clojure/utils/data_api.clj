@@ -3,6 +3,9 @@
             [auth0-clojure.utils.urls :as urls]
             [clojure.string :as string]))
 
+;; TODO-lib - extract these fns in a separate lib
+;; since the actual descriptor could be something entirely different
+
 (defn api-descriptor-resolver [api-descriptor]
   (cond
     (map? api-descriptor) api-descriptor
@@ -12,7 +15,7 @@
               "Api descriptor is not a map or function!"
               {:type :validation-failed}))))
 
-(defn operation-resolver [api-descriptor operation]
+(defn op-resolver [api-descriptor operation]
   (let [operation-data (get-in
                          api-descriptor
                          [:operations operation])]
@@ -23,14 +26,14 @@
             {:type      :operation-not-valid
              :operation operation})))))
 
-(defn invoke-base [{:keys [:api-descriptor]
-                    :as config}
+(defn op-request [api-descriptor
+                  config
                    {:keys [:operation
                            :path-params
                            :query-params
                            :body]}]
   (let [api-descriptor (api-descriptor-resolver api-descriptor)
-        {{:keys [method path headers]} :http} (operation-resolver api-descriptor operation)
+        {{:keys [method path headers]} :http} (op-resolver api-descriptor operation)
         path-prefix    (get-in api-descriptor [:metadata :endpoint-prefix])
         path-parts     (map
                          #(if (keyword? %)
@@ -53,3 +56,51 @@
       config
       path
       req-data)))
+
+(defn update-values [m f & args]
+  (reduce
+    (fn [r [k v]]
+      (assoc r k (apply f v args)))
+    {}
+    m))
+
+(defn ops-list [api-descriptor]
+  (update-values
+    (:operations api-descriptor)
+    :doc))
+
+(defn op-data [api-descriptor op-key]
+  (-> api-descriptor
+      :operations
+      (get op-key)))
+
+(defn op-doc [api-descriptor op-key]
+  (let [{op-name :name
+         :keys [doc doc-url http]} (op-data api-descriptor op-key)
+        {:keys [path]} http
+        op-title (string/join " " (map string/capitalize (string/split (name op-name) #"-")))
+        path-params (seq (filter keyword? path))
+        query-params (seq [:filter])]
+    (string/join
+      "\n"
+      (cond-> ["##########################"
+               op-title
+               (str "(" op-name ")")
+               "##########################"]
+        doc
+        (into [""
+               doc])
+        doc-url
+        (into [""
+               "Official docs:"
+               doc-url])
+        path-params
+        (into [""
+               "-------------------------"
+               "Path Parameters:"
+               (string/join ", " path-params)])
+        query-params
+        (into [""
+               "-------------------------"
+               "Query Parameters:"
+               (string/join ", " query-params)])))))
