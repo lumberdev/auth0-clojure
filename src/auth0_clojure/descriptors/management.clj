@@ -1,6 +1,7 @@
 (ns auth0-clojure.descriptors.management)
 
 ;; TODO - better docs
+;; TODO - query params (in the format {:filter "string"} for now
 (def api-descriptor
   {:version    "2.0"
    :metadata   {:endpoint-prefix "/api/v2/"}

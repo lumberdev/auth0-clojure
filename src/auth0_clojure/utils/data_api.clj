@@ -36,13 +36,16 @@
         {{:keys [method path headers]} :http} (op-resolver api-descriptor operation)
         path-prefix    (get-in api-descriptor [:metadata :endpoint-prefix])
         path-parts     (map
+                         ;; TODO - this here could be a keyword OR a map with
+                         ;; validation spec for the respective param
                          #(if (keyword? %)
-                            ;; TODO - throw exception if no such path param???
+                            ;; TODO - throw exception if path param missing?
+                            ;; non-existent path params are ignored
                             (get path-params %)
                             %)
                          path)
         path           (str path-prefix (string/join "/" path-parts))
-        ;; TODO - throw exception if no such query param???
+        ;; TODO - non-existent query params are ignored
         path           (if query-params
                          (urls/build-url-params path query-params)
                          path)
@@ -77,10 +80,10 @@
 (defn op-doc [api-descriptor op-key]
   (let [{op-name :name
          :keys [doc doc-url http]} (op-data api-descriptor op-key)
-        {:keys [path]} http
+        {:keys [path query]} http
         op-title (string/join " " (map string/capitalize (string/split (name op-name) #"-")))
-        path-params (seq (filter keyword? path))
-        query-params (seq [:filter])]
+        path-params (not-empty (filter keyword? path))
+        query-params (not-empty query)]
     (string/join
       "\n"
       (cond-> ["##########################"
@@ -103,4 +106,4 @@
         (into [""
                "-------------------------"
                "Query Parameters:"
-               (string/join ", " query-params)])))))
+               (string/join "/n" (map (fn [[k v]] (str k " - " v)) query-params))])))))
