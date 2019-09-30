@@ -77,13 +77,13 @@
       :operations
       (get op-key)))
 
-(defn op-doc [api-descriptor op-key]
-  (let [{op-name :name
-         :keys [doc doc-url http]} (op-data api-descriptor op-key)
-        {:keys [path query]} http
+(defn op-doc-str [{op-name :name
+                   :keys [doc doc-url http]}]
+  (let [{:keys [path query]} http
         op-title (string/join " " (map string/capitalize (string/split (name op-name) #"-")))
         path-params (not-empty (filter keyword? path))
         query-params (not-empty query)]
+
     (string/join
       "\n"
       (cond-> ["##########################"
@@ -107,3 +107,8 @@
                "-------------------------"
                "Query Parameters:"
                (string/join "/n" (map (fn [[k v]] (str k " - " v)) query-params))])))))
+
+(defn op-doc [api-descriptor op-key]
+  (if-let [op (op-data api-descriptor op-key)]
+    (op-doc-str op)
+    (str "No docs for " op-key)))
