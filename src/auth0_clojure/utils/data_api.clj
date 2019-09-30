@@ -67,7 +67,7 @@
     {}
     m))
 
-(defn ops-list [api-descriptor]
+(defn ops [api-descriptor]
   (update-values
     (:operations api-descriptor)
     :doc))

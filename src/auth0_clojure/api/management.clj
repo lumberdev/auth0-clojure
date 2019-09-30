@@ -8,16 +8,22 @@
     config
     options))
 
-(defn ops-list []
-  (data-api/ops-list
+(defn ops
+  "A map of all available operations and their short description."
+  []
+  (data-api/ops
     mgmt-desc/api-descriptor))
 
-(defn op-data [op-key]
+(defn op-data
+  "Given an operation name (keyword) returns a map containing the operation data."
+  [op-key]
   (data-api/op-data
     mgmt-desc/api-descriptor
     op-key))
 
-(defn op-doc [op-key]
+(defn op-doc
+  "Given an operation name (keyword) returns a doc string."
+  [op-key]
   (data-api/op-doc
     mgmt-desc/api-descriptor
     op-key))
