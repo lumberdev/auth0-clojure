@@ -48,15 +48,6 @@
               oauth-vals-edn->json
               json/edn->json))))))
 
-(defn auth0-request-2 [config access-token path options]
-  (let [mgmt-path (str "/api/v2" path)]
-    (auth0-request
-      config
-      mgmt-path
-      (merge
-        options
-        {:headers (bearer-header access-token)}))))
-
 (defn auth0-mgmt-request [{:keys [:auth0/mgmt-access-token] :as config} path options]
   (auth0-request
     config
