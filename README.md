@@ -179,7 +179,8 @@ Creates a request to reset the user's password. This will only work for db conne
 ```clojure
 (change-password
     {:auth0/email      "<email>"
-     :auth0/connection "<connection>" ;; usually "Username-Password-Authentication"})
+     :auth0/connection "<connection>" ;; usually "Username-Password-Authentication"
+     })
 ```
 
 #### /userinfo - User Info
@@ -193,13 +194,12 @@ This will only work if the token has been granted the `openid` scope.
 
 ## TODO
 
-- Management API
 - Spec (+ `openid`, `email`, `authorization-code`)
-- First alpha
 - Authentication API Passwordless support
 - Authentication API MFA support
 - Authentication API WS-Federation support
-- More samples (for Auth API, the above 3)
+- More samples (for Auth API - including the above 3, Management API)
+- Management API docs
 - Default utility that handles Management API token refreshes
 - Tests
 
