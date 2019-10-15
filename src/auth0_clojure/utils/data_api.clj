@@ -1,7 +1,8 @@
 (ns auth0-clojure.utils.data-api
   (:require [auth0-clojure.utils.requests :as req]
             [auth0-clojure.utils.urls :as urls]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [clj-http.client :as client]))
 
 ;; TODO-lib - extract these fns in a separate lib
 ;; since the actual descriptor could be something entirely different
@@ -59,6 +60,17 @@
       config
       path
       req-data)))
+
+(defn op-invoke [api-descriptor
+                 config
+                 operation]
+  ;; TODO-lib - this needs to be abstracted away
+  ;; so that the client library can be anything with any args etc.
+  (client/request
+    (op-request
+      api-descriptor
+      config
+      operation)))
 
 (defn update-values [m f & args]
   (reduce

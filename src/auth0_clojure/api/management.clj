@@ -2,11 +2,17 @@
   (:require [auth0-clojure.utils.data-api :as data-api]
             [auth0-clojure.descriptors.management :as mgmt-desc]))
 
-(defn op-request [config options]
+(defn op-request [config operation]
   (data-api/op-request
     mgmt-desc/api-descriptor
     config
-    options))
+    operation))
+
+(defn op-invoke [config operation]
+  (data-api/op-invoke
+    mgmt-desc/api-descriptor
+    config
+    operation))
 
 (defn ops
   "A map of all available operations and their short description."
