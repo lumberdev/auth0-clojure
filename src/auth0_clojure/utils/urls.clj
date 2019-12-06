@@ -18,7 +18,7 @@
     v))
 
 (def raw-param-ks
-  #{:auth0/redirect-uri})
+  #{:auth0/redirect-uri :auth0/email})
 
 (defn param-key->param-fn
   "Some query parameters should be raw, depending on the key."
